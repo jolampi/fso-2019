@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
+
+import personService from './services/persons'
+
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
@@ -11,26 +13,37 @@ const App = () => {
     const [ persons, setPersons] = useState([])
 
     useEffect(() => {
-        axios
-            .get('http://localhost:3001/persons')
-            .then(response => setPersons(response.data))
+        personService.getAll().then(initialPersons => setPersons(initialPersons))
     }, [])
+
+    const deleteContactOf = (deletePerson) => {
+        if (window.confirm(`Delete ${deletePerson.name}?`)) {
+            personService.remove(deletePerson.id).then(() => {
+                setPersons(persons.filter(person => person.id !== deletePerson.id))
+            })
+        }
+    }
 
     const newNameHandler = (event) => {
         event.preventDefault()
-        let exists = false
-        persons.forEach(person => {
-            if (person.name === newName) {
-                exists = true
-                /* No break statement for forEach? boo javascript */
-            }
-        })
-        if (exists) {
-            alert(`${newName} is already added to phonebook`)
-        } else {
-            setPersons(persons.concat({ name: newName, number: newNumber }))
-            setNewName('')
-            setNewNumber('')
+        const existingPerson = persons.find(person => person.name === newName)
+        if (existingPerson === undefined) {
+            personService
+                .create({ name: newName, number: newNumber })
+                .then(newPerson => {
+                    setPersons(persons.concat(newPerson))
+                    setNewName('')
+                    setNewNumber('')
+                })
+        } else if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+            personService
+                .update(existingPerson.id, { ...existingPerson, number: newNumber })
+                .then(updatedPerson => {
+                    console.log('hello')
+                    setPersons(persons.map(person => person.id !== updatedPerson.id ? person : updatedPerson))
+                    setNewName('')
+                    setNewNumber('')
+                })
         }
     }
 
@@ -45,11 +58,13 @@ const App = () => {
             <h2>add a new</h2>
             <PersonForm
                 onSubmit={newNameHandler}
+                nameValue={newName}
+                numberValue={newNumber}
                 onNameChange={nameChangeHandler}
                 onNumberChange={numberChangeHandler}
             />
             <h2>Numbers</h2>
-            <Persons persons={persons} filter={filter} />
+            <Persons persons={persons} filter={filter} deleteContactOf={deleteContactOf} />
         </div>
     )
 
