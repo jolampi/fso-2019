@@ -3,14 +3,19 @@ import React, { useState, useEffect } from 'react'
 import personService from './services/persons'
 
 import Filter from './components/Filter'
+import Notification from './components/Notification'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
 
 const App = () => {
+    const MESSAGE_TIMEOUT = 6000
+
     const [ newName, setNewName ] = useState('')
     const [ newNumber, setNewNumber ] = useState('')
     const [ filter, setFilter ] = useState('')
     const [ persons, setPersons] = useState([])
+    const [ statusMessage, setStatusMessage ] = useState(null)
+    const [ statusWarning, setStatusWarning ] = useState(false)
 
     useEffect(() => {
         personService.getAll().then(initialPersons => setPersons(initialPersons))
@@ -18,8 +23,19 @@ const App = () => {
 
     const deleteContactOf = (deletePerson) => {
         if (window.confirm(`Delete ${deletePerson.name}?`)) {
-            personService.remove(deletePerson.id).then(() => {
+            personService.remove(deletePerson.id)
+            .then(() => {
                 setPersons(persons.filter(person => person.id !== deletePerson.id))
+                setStatusMessage(`Deleted ${deletePerson.name}`)
+                setTimeout(() => setStatusMessage(null), MESSAGE_TIMEOUT)
+            })
+            .catch(error => {
+                setStatusWarning(true)
+                setStatusMessage(`Information of ${deletePerson.name} has already been deleted from server`)
+                setTimeout(() => {
+                    setStatusWarning(false)
+                    setStatusMessage(null)
+                }, MESSAGE_TIMEOUT)
             })
         }
     }
@@ -32,6 +48,8 @@ const App = () => {
                 .create({ name: newName, number: newNumber })
                 .then(newPerson => {
                     setPersons(persons.concat(newPerson))
+                    setStatusMessage(`Added ${newPerson.name}`)
+                    setTimeout(() => setStatusMessage(null), MESSAGE_TIMEOUT)
                     setNewName('')
                     setNewNumber('')
                 })
@@ -39,8 +57,9 @@ const App = () => {
             personService
                 .update(existingPerson.id, { ...existingPerson, number: newNumber })
                 .then(updatedPerson => {
-                    console.log('hello')
                     setPersons(persons.map(person => person.id !== updatedPerson.id ? person : updatedPerson))
+                    setStatusMessage(`Updated ${updatedPerson.name}`)
+                    setTimeout(() => setStatusMessage(null), MESSAGE_TIMEOUT)
                     setNewName('')
                     setNewNumber('')
                 })
@@ -54,6 +73,7 @@ const App = () => {
     return (
         <div>
             <h2>Phonebook</h2>
+            <Notification message={statusMessage} warning={statusWarning} />
             <Filter value={filter} onChange={filterChangeHandler} />
             <h2>add a new</h2>
             <PersonForm
