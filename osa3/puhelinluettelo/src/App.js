@@ -24,19 +24,11 @@ const App = () => {
     const deleteContactOf = (deletePerson) => {
         if (window.confirm(`Delete ${deletePerson.name}?`)) {
             personService.remove(deletePerson.id)
-            .then(() => {
-                setPersons(persons.filter(person => person.id !== deletePerson.id))
-                setStatusMessage(`Deleted ${deletePerson.name}`)
-                setTimeout(() => setStatusMessage(null), MESSAGE_TIMEOUT)
-            })
-            .catch(error => {
-                setStatusWarning(true)
-                setStatusMessage(`Information of ${deletePerson.name} has already been deleted from server`)
-                setTimeout(() => {
-                    setStatusWarning(false)
-                    setStatusMessage(null)
-                }, MESSAGE_TIMEOUT)
-            })
+                .then(() => {
+                    setPersons(persons.filter(person => person.id !== deletePerson.id))
+                    displayMessage(`Deleted ${deletePerson.name}`)
+                })
+                .catch(error => displayMessage(`Information of ${deletePerson.name} has already been deleted from server`, true))
         }
     }
 
@@ -48,30 +40,31 @@ const App = () => {
                 .create({ name: newName, number: newNumber })
                 .then(newPerson => {
                     setPersons(persons.concat(newPerson))
-                    setStatusMessage(`Added ${newPerson.name}`)
-                    setTimeout(() => setStatusMessage(null), MESSAGE_TIMEOUT)
+                    displayMessage(`Added ${newPerson.name}`, false)
                     setNewName('')
                     setNewNumber('')
                 })
-                .catch(error => {
-                    setStatusWarning(true)
-                    setStatusMessage(`Error: ${error.response.data.error}`)
-                    setTimeout(() => {
-                        setStatusWarning(false)
-                        setStatusMessage(null)
-                    }, MESSAGE_TIMEOUT)
-                })
+                .catch (error => displayMessage(`${error.response.data.error}`, true))
         } else if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
             personService
                 .update(existingPerson.id, { ...existingPerson, number: newNumber })
                 .then(updatedPerson => {
                     setPersons(persons.map(person => person.id !== updatedPerson.id ? person : updatedPerson))
-                    setStatusMessage(`Updated ${updatedPerson.name}`)
-                    setTimeout(() => setStatusMessage(null), MESSAGE_TIMEOUT)
+                    displayMessage(`Updated ${updatedPerson.name}`, false)
                     setNewName('')
                     setNewNumber('')
                 })
+                .catch (error => displayMessage(`${error.response.data.error}`, true))
         }
+    }
+
+    const displayMessage = (message, warning) => {
+        setStatusWarning(warning)
+        setStatusMessage(message)
+        setTimeout(() => {
+            setStatusWarning(false)
+            setStatusMessage(null)
+        }, MESSAGE_TIMEOUT)
     }
 
     const nameChangeHandler = (event) => setNewName(event.target.value)
