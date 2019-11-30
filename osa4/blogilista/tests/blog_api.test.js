@@ -66,9 +66,9 @@ test('likes are set to 0 if not defined', async () => {
 
 test('invalid blog is not added', async () => {
     const noTitle = {
-        author: 'secret',
+        url: 'secret',
     }
-    const noAuthor = {
+    const noUrl = {
         title: 'secret',
     }
 
@@ -79,7 +79,7 @@ test('invalid blog is not added', async () => {
 
     await api
         .post('/api/blogs')
-        .send(noAuthor)
+        .send(noUrl)
         .expect(400)
 })
 
