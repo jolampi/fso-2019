@@ -9,6 +9,7 @@ const Blog = require('../models/blog')
 const newBlog = {
     title: 'new blog',
     author: 'John Doe',
+    url: 'www'
 }
 
 beforeEach(async () => {
