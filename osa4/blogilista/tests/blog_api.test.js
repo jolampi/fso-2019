@@ -83,6 +83,38 @@ test('invalid blog is not added', async () => {
         .expect(400)
 })
 
+test('delete a blog with status code 204', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToDelete = blogsAtStart[0]
+
+    await api
+        .delete(`/api/blogs/${blogToDelete.id}`)
+        .expect(204)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    expect(blogsAtEnd.length).toBe(helper.initialBlogs.length - 1)
+    expect(blogsAtEnd).not.toContainEqual(blogToDelete)
+})
+
+test('a blogs likes can be updated', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToUpdate = blogsAtStart[0]
+
+    const updatedLikes = {
+        likes: blogToUpdate.likes + 1
+    }
+
+    await api
+        .put(`/api/blogs/${blogToUpdate.id}`)
+        .send(updatedLikes)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    const updatedBlog = blogsAtEnd.find(blog => blog.id === blogToUpdate.id)
+
+    expect(updatedBlog.likes).toBe(blogToUpdate.likes + 1)
+    expect(updatedBlog.author).toBe(blogToUpdate.author)
+})
+
 afterAll(() => {
     mongoose.connection.close()
 })
