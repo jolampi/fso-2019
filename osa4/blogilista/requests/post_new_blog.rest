@@ -1,9 +1,10 @@
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im5ld2JpZTM2MCIsImlkIjoiNWRlNmI4NTM5MTgxMDIxNzc0NjhjZmZjIiwiaWF0IjoxNTc1NjU5NTY2fQ.JO46qqKsgORWhGvzGaOAxNEmOXTNUF_dEwn2JnDtmXE
 
 {
-    "title": "Another Fantasy",
-    "author": "George R.R. Tolkien",
+    "title": "Another Remes Book 3",
+    "author": "Ilkka Remes",
     "url": "url",
-    "likes": 9001
+    "likes": 0
 }
