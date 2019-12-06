@@ -7,6 +7,13 @@ const mongoose = require('mongoose')
 const Blog = require('../models/blog')
 const User = require('../models/user')
 
+const login = async (username, password) => {
+    const result = await api
+        .post('/api/login')
+        .send({ username, password })
+    return result.body
+}
+
 beforeEach(async () => {
     await Blog.deleteMany({})
 
@@ -33,20 +40,7 @@ test('identifier field is called id', async () => {
     expect(blog._id).not.toBeDefined()
 })
 
-test('delete a blog with status code 204', async () => {
-    const blogsAtStart = await helper.blogsInDb()
-    const blogToDelete = blogsAtStart[0]
-
-    await api
-        .delete(`/api/blogs/${blogToDelete.id}`)
-        .expect(204)
-
-    const blogsAtEnd = await helper.blogsInDb()
-    expect(blogsAtEnd.length).toBe(helper.initialBlogs.length - 1)
-    expect(blogsAtEnd).not.toContainEqual(blogToDelete)
-})
-
-test('a blogs likes can be updated', async () => {
+test('a blog\'s likes can be updated', async () => {
     const blogsAtStart = await helper.blogsInDb()
     const blogToUpdate = blogsAtStart[0]
 
@@ -70,13 +64,6 @@ describe('when there is initially one user at db', () => {
         username: 'root',
         password: 'non-alcoholic bear',
         name: 'Tree Legs'
-    }
-
-    const login = async (username, password) => {
-        const result = await api
-            .post('/api/login')
-            .send({ username, password })
-        return result.body
     }
 
     beforeEach(async () => {
@@ -246,7 +233,84 @@ describe('when there is initially one user at db', () => {
             expect(blogsAtEnd.length).toBe(blogsAtStart.length)
         })
     })
+})
 
+describe('when there are initially multiple users at the db', () => {
+    const userA = { username: 'antelope', password: 'passw0rd' }
+    const userB = { username: 'buffalo', password: 'password123' }
+
+    beforeEach(async () => {
+        await User.deleteMany({})
+        await api
+            .post('/api/users')
+            .send(userA)
+        await api
+            .post('/api/users')
+            .send(userB)
+    })
+
+    describe('when they have multiple blogs associated with them', () => {
+        const blogOfA = { title: 'A title', url: 'meh' }
+        const blogOfB = { title: 'B title', url: 'meh' }
+
+        beforeEach(async () => {
+            let result = await login(userA.username, userA.password)
+            await api
+                .post('/api/blogs')
+                .auth(result.token, { type: 'bearer' })
+                .send(blogOfA)
+            result = await login(userB.username, userB.password)
+            await api
+                .post('/api/blogs')
+                .auth(result.token, { type: 'bearer' })
+                .send(blogOfB)
+        })
+
+        test('A user can delete one of their own blogs', async () => {
+            const users = await helper.usersInDb()
+            const user = users.find(user => user.username === userA.username)
+
+            const blogsAtStart = await helper.blogsInDb()
+            const blog = blogsAtStart.find(blog => {
+                return (blog.user !== undefined)
+                    ? blog.user.toString() === user.id.toString()
+                    : false
+            })
+
+            const loginResult = await login(userA.username, userA.password)
+            await api
+                .delete(`/api/blogs/${blog.id.toString()}`)
+                .auth(loginResult.token, { type: 'bearer' })
+                .expect(204)
+
+            const blogsAtEnd = await helper.blogsInDb()
+            expect(blogsAtEnd.length).toBe(blogsAtStart.length - 1)
+            expect(blogsAtEnd).not.toContainEqual(blog)
+        })
+
+        test('A user can\'t delete other users\' blogs', async () => {
+            const users = await helper.usersInDb()
+            const user = users.find(user => user.username === userB.username)
+
+            const blogsAtStart = await helper.blogsInDb()
+            const blog = blogsAtStart.find(blog => {
+                return (blog.user !== undefined)
+                    ? blog.user.toString() === user.id.toString()
+                    : false
+            })
+
+            const loginResult = await login(userA.username, userA.password)
+            const result = await api
+                .delete(`/api/blogs/${blog.id.toString()}`)
+                .auth(loginResult.token, { type: 'bearer' })
+                .expect(401)
+                .expect('Content-Type', /application\/json/)
+            expect(result.body.error).toContain('Unauthorized')
+
+            const blogsAtEnd = await helper.blogsInDb()
+            expect(blogsAtEnd.length).toBe(blogsAtStart.length)
+        })
+    })
 })
 
 afterAll(() => {

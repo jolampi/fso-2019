@@ -19,10 +19,6 @@ blogRouter.post('/', async (request, response, next) => {
             return response.status(401).json({ error: 'token missing or invalid' })
         }
 
-        /*if (body.title === undefined || body.url === undefined) {
-            response.status(400).end()
-        }*/
-
         const user = await User.findById(decodedToken.id)
 
         const blog = new Blog({
@@ -44,8 +40,17 @@ blogRouter.post('/', async (request, response, next) => {
 
 blogRouter.delete('/:id', async (request, response, next) => {
     try {
-        await Blog.findByIdAndRemove(request.params.id)
-        response.status(204).end()
+        const decodedToken = jwt.verify(request.token, process.env.SECRET)
+        if (!request.token || !decodedToken.id) {
+            return response.status(401).json({ error: 'token missing or invalid' })
+        }
+
+        const blog = await Blog.findById(request.params.id)
+        if (blog.user.toString() === decodedToken.id.toString()) {
+            await Blog.findByIdAndRemove(request.params.id)
+            response.status(204).end()
+        }
+        response.status(401).json({ error: 'Unauthorized document removal request' })
     } catch(exception) {
         next(exception)
     }
