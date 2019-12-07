@@ -1,4 +1,3 @@
-
 // eslint-disable-next-line no-unused-vars
 const dummy = (blogs) => {
     return 1
@@ -15,8 +14,48 @@ const totalLikes = (blogs) => {
     return blogs.reduce(reducer, 0)
 }
 
+const mostBlogs = (blogs) => {
+    if (blogs.length === 0) { return undefined }
+    let authors = []
+    blogs.forEach(blog => {
+        if (!authors[blog.author]) { authors[blog.author] = 0 }
+        authors[blog.author] += 1
+    })
+    let biggest = 0
+    let biggestName = ''
+    for (const [key, value] of Object.entries(authors)) {
+        console.log('I am stupid javascript also', biggest, '>', value)
+        if (parseInt(value) > parseInt(biggest)) {
+            biggestName = key
+            biggest = value
+        }
+    }
+    return { author: biggestName, blogs: biggest }
+}
+
+const mostLikes = (blogs) => {
+    if (blogs.length === 0) { return undefined }
+    let authors = []
+    blogs.forEach(blog => {
+        if (!authors[blog.author]) { authors[blog.author] = 0 }
+        authors[blog.author] += blog.likes
+    })
+    let biggest = 0
+    let biggestName = ''
+    for (const [key, value] of Object.entries(authors)) {
+        console.log('I am stupid javascript also', biggest, '>', value)
+        if (parseInt(value) > parseInt(biggest)) {
+            biggestName = key
+            biggest = value
+        }
+    }
+    return { author: biggestName, likes: biggest }
+}
+
 module.exports = {
     dummy,
     favouriteBlog,
-    totalLikes
+    totalLikes,
+    mostBlogs,
+    mostLikes
 }

@@ -39,3 +39,43 @@ describe('favourite blog', () => {
         expect(result.likes).toBe(12)
     })
 })
+
+describe('most blogs', () => {
+    test('in an empty list is undefined', () => {
+        expect(listHelper.mostBlogs(blogs.list_0)).toBeUndefined()
+    })
+
+    test('in a list with one element to be that one\'s', () => {
+        expect(listHelper.mostBlogs(blogs.list_1)).toEqual({
+            author: 'Edsger W. Dijkstra',
+            blogs: 1
+        })
+    })
+
+    /*test('in a bigger list is calculated right', () => {
+        expect(listHelper.mostBlogs(blogs.list_1)).toEqual({
+            author: 'Robert C. Martin',
+            blogs: 3
+        })
+    })*/
+})
+
+describe('most likes', () => {
+    test('in an empty list is undefined', () => {
+        expect(listHelper.mostLikes(blogs.list_0)).toBeUndefined()
+    })
+
+    test('in a list with one element to be that one\'s', () => {
+        expect(listHelper.mostLikes(blogs.list_1)).toEqual({
+            author: 'Edsger W. Dijkstra',
+            likes: 5
+        })
+    })
+
+    /*test('in a bigger list is calculated right', () => {
+        expect(listHelper.mostLikes(blogs.list_1)).toEqual({
+            author: 'Edsger W. Dijkstra',
+            likes: 17
+        })
+    })*/
+})
