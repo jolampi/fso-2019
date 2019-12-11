@@ -29,7 +29,6 @@ const App = () => {
         if (loggedUserJSON) {
             const user = JSON.parse(loggedUserJSON)
             setUser(user)
-            blogService.setToken(user.token)
         }
     }, [])
 
@@ -38,7 +37,6 @@ const App = () => {
         try {
             const user = await loginService.login({ username, password })
             window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
-            blogService.setToken(user.token)
             setUser(user)
             setUsername("")
             setPassword("")
@@ -57,7 +55,7 @@ const App = () => {
     const handleNewBlog = async (blogObject) => {
         let success = true
         try {
-            const createdBlog = await blogService.create(blogObject)
+            const createdBlog = await blogService.create(blogObject, user.token)
             setBlogs(blogs.concat(createdBlog))
             newNotification(`a new blog ${createdBlog.title} added`, false)
         } catch(exception) {
