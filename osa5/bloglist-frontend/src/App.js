@@ -14,9 +14,8 @@ const App = () => {
     const [password, setPassword] = useState('')
     const [user, setUser] = useState(null)
     const [blogs, setBlogs] = useState([])
-    const [notificationMessage, setNotificationMessage] = useState(null)
-    const [notificationWarning, setNotificationWarning] = useState(false)
     const blogFormRef = React.createRef()
+    const notificationRef = React.createRef()
 
     useEffect(() => {
         const loadBlogs = (async () => {
@@ -42,9 +41,9 @@ const App = () => {
             setUser(user)
             setUsername('')
             setPassword('')
-            newNotification('succesfully logged in', false)
+            handleNotification('succesfully logged in', false)
         } catch(exception) {
-            newNotification('wrong username or password', true)
+            handleNotification('wrong username or password', true)
         }
     }
 
@@ -60,20 +59,16 @@ const App = () => {
             const createdBlog = await blogService.create(blogObject, user.token)
             blogFormRef.current.toggleVisibility()
             setBlogs(blogs.concat(createdBlog))
-            newNotification(`a new blog ${createdBlog.title} added`, false)
+            handleNotification(`a new blog ${createdBlog.title} added`, false)
         } catch(exception) {
-            newNotification(exception.response.data.error, true)
+            handleNotification(exception.response.data.error, true)
             success = false
         }
         return success
     }
 
-    const newNotification = (message, warning) => {
-        setNotificationMessage(message)
-        setNotificationWarning(warning)
-        setTimeout(() => {
-            setNotificationMessage(null)
-        }, 5000)
+    const handleNotification = (message, warning) => {
+        notificationRef.current.setNotification(message, warning)
     }
 
     // maybe refactor this to use object reference
@@ -88,7 +83,7 @@ const App = () => {
             const updatedBlog = await blogService.update(id, changedBlog)
             setBlogs(blogs.map(blog => blog.id !== id ? blog : updatedBlog))
         } catch(exception) {
-            newNotification(`the blog '${blog.title}' was already deleted from server`, true)
+            handleNotification(`the blog '${blog.title}' was already deleted from server`, true)
             setBlogs(blogs.filter(blog => blog.id !== id))
         }
     }
@@ -98,9 +93,9 @@ const App = () => {
             try {
                 await blogService.remove(blogToRemove.id, user.token)
                 setBlogs(blogs.filter(blog => blog.id !== blogToRemove.id))
-                newNotification(`Removed ${blogToRemove.title}`, false)
+                handleNotification(`Removed ${blogToRemove.title}`, false)
             } catch(exception) {
-                newNotification(`the blog '${blogToRemove.title}' was already deleted from server`, true)
+                handleNotification(`the blog '${blogToRemove.title}' was already deleted from server`, true)
                 setBlogs(blogs.filter(blog => blog.id !== blogToRemove.id))
             }
         }
@@ -108,7 +103,7 @@ const App = () => {
 
     return (user === null) ? (
         <div>
-            <Notification notification={notificationMessage} warning={notificationWarning} />
+            <Notification ref={notificationRef} />
             <LoginForm
                 onSubmit={handleLogin}
                 username={username}
@@ -120,7 +115,7 @@ const App = () => {
     ) : (
         <div>
             <h2>blogs</h2>
-            <Notification notification={notificationMessage} warning={notificationWarning} />
+            <Notification ref={notificationRef} />
             <p>
                 {user.name} logged in
                 <button onClick={handleLogout}>logout</button>
