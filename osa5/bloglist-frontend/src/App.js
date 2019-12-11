@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
-import LoginForm from './components/LoginForm';
+import LoginForm from './components/LoginForm'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 
@@ -10,8 +10,8 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 
 const App = () => {
-    const [username, setUsername] = useState("")
-    const [password, setPassword] = useState("")
+    const [username, setUsername] = useState('')
+    const [password, setPassword] = useState('')
     const [user, setUser] = useState(null)
     const [blogs, setBlogs] = useState([])
     const [notificationMessage, setNotificationMessage] = useState(null)
@@ -40,11 +40,11 @@ const App = () => {
             const user = await loginService.login({ username, password })
             window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
             setUser(user)
-            setUsername("")
-            setPassword("")
-            newNotification("succesfully logged in", false)
+            setUsername('')
+            setPassword('')
+            newNotification('succesfully logged in', false)
         } catch(exception) {
-            newNotification("wrong username or password", true)
+            newNotification('wrong username or password', true)
         }
     }
 
@@ -64,9 +64,8 @@ const App = () => {
         } catch(exception) {
             newNotification(exception.response.data.error, true)
             success = false
-        } finally {
-            return success
         }
+        return success
     }
 
     const newNotification = (message, warning) => {
@@ -110,7 +109,7 @@ const App = () => {
     return (user === null) ? (
         <div>
             <Notification notification={notificationMessage} warning={notificationWarning} />
-            <LoginForm 
+            <LoginForm
                 onSubmit={handleLogin}
                 username={username}
                 setUsername={setUsername}
@@ -138,10 +137,10 @@ const App = () => {
                         userid={user.id}
                         incrementLikes={() => incrementLikes(blog.id)}
                         removeBlog={() => removeBlog(blog)}
-                />
-            )}
+                    />
+                )}
         </div>
     )
 }
 
-export default App;
+export default App

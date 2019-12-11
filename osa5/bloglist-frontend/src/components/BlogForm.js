@@ -1,17 +1,18 @@
 import React, { useState } from 'react'
+import PropTypes from 'prop-types'
 
 const BlogForm = ({ handleNewBlog }) => {
-    const [title, setTitle] = useState("")
-    const [author, setAuthor] = useState("")
-    const [url, setUrl] = useState("")
+    const [title, setTitle] = useState('')
+    const [author, setAuthor] = useState('')
+    const [url, setUrl] = useState('')
 
     const onSubmit = async (event) => {
         event.preventDefault()
         const blogObject = { title, author, url }
         if (await handleNewBlog(blogObject)) {
-            setTitle("")
-            setAuthor("")
-            setUrl("")
+            setTitle('')
+            setAuthor('')
+            setUrl('')
         }
     }
 
@@ -25,7 +26,7 @@ const BlogForm = ({ handleNewBlog }) => {
                         type="text"
                         value={title}
                         name="Title"
-                        onChange={ ({target}) => setTitle(target.value) }
+                        onChange={ ({ target }) => setTitle(target.value) }
                     />
                 </div>
                 <div>
@@ -34,7 +35,7 @@ const BlogForm = ({ handleNewBlog }) => {
                         type="text"
                         value={author}
                         name="Author"
-                        onChange={ ({target}) => setAuthor(target.value) }
+                        onChange={ ({ target }) => setAuthor(target.value) }
                     />
                 </div>
                 <div>
@@ -43,13 +44,17 @@ const BlogForm = ({ handleNewBlog }) => {
                         type="text"
                         value={url}
                         name="Url"
-                        onChange={ ({target}) => setUrl(target.value) }
+                        onChange={ ({ target }) => setUrl(target.value) }
                     />
                 </div>
                 <button type="submit">create</button>
             </form>
         </div>
     )
+}
+
+BlogForm.propTypes = {
+    handleNewBlog: PropTypes.func.isRequired
 }
 
 export default BlogForm

@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
+import PropTypes from 'prop-types'
 
 const Blog = ({ blog, userid, incrementLikes, removeBlog }) => {
     const [detailed, setDetailed] = useState(false)
 
     const toggleDetailed = () => { setDetailed(!detailed) }
-    
+
     const detailedView = { display: detailed ? '' : 'none' }
 
     const blogStyle = {
@@ -35,6 +36,13 @@ const Blog = ({ blog, userid, incrementLikes, removeBlog }) => {
             </div>
         </div>
     )
+}
+
+Blog.propTypes = {
+    blog: PropTypes.object.isRequired,
+    userid: PropTypes.string.isRequired,
+    incrementLikes: PropTypes.func.isRequired,
+    removeBlog: PropTypes.func.isRequired
 }
 
 export default Blog
