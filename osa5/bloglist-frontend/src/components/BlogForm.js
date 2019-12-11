@@ -12,11 +12,12 @@ const BlogForm = ({ handleNewBlog }) => {
             setTitle("")
             setAuthor("")
             setUrl("")
-        }        
+        }
     }
 
     return (
         <div>
+            <h2>create new</h2>
             <form onSubmit={onSubmit}>
                 <div>
                     title:
