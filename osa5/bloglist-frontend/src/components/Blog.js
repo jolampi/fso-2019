@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, userid, incrementLikes, removeBlog }) => {
     const [detailed, setDetailed] = useState(false)
 
     const toggleDetailed = () => { setDetailed(!detailed) }
@@ -16,16 +16,22 @@ const Blog = ({ blog }) => {
         marginBottom: 5
     }
 
+    const removeButtonStyle = {
+        background: 'lightblue',
+        display: (blog.user.id === userid) ? '' : 'none'
+    }
+
     return (
         <div style={blogStyle}>
             <div onClick={() => toggleDetailed()}>
-                {blog.title} - {blog.author}
+                {blog.title} {blog.author}
             </div>
             <div style={detailedView}>
                 {blog.url} <br />
                 {blog.likes} likes
-                <button>like</button> <br />
-                added by {blog.user ? blog.user.name : 'NaN'}
+                <button onClick={incrementLikes}>like</button> <br />
+                added by {blog.user ? blog.user.name : 'NaN'} <br />
+                <button  onClick={removeBlog} style={removeButtonStyle}>remove</button>
             </div>
         </div>
     )

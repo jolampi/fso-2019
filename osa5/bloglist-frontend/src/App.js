@@ -77,6 +77,36 @@ const App = () => {
         }, 5000)
     }
 
+    // maybe refactor this to use object reference
+    const incrementLikes = async (id) => {
+        const blog = blogs.find(b => b.id === id)
+        const changedBlog = {
+            ...blog,
+            user: blog.user.id,
+            likes: blog.likes + 1
+        }
+        try {
+            const updatedBlog = await blogService.update(id, changedBlog)
+            setBlogs(blogs.map(blog => blog.id !== id ? blog : updatedBlog))
+        } catch(exception) {
+            newNotification(`the blog '${blog.title}' was already deleted from server`, true)
+            setBlogs(blogs.filter(blog => blog.id !== id))
+        }
+    }
+
+    const removeBlog = async (blogToRemove) => {
+        if (window.confirm(`Remove ${blogToRemove.title}?`)) {
+            try {
+                await blogService.remove(blogToRemove.id, user.token)
+                setBlogs(blogs.filter(blog => blog.id !== blogToRemove.id))
+                newNotification(`Removed ${blogToRemove.title}`, false)
+            } catch(exception) {
+                newNotification(`the blog '${blogToRemove.title}' was already deleted from server`, true)
+                setBlogs(blogs.filter(blog => blog.id !== blogToRemove.id))
+            }
+        }
+    }
+
     return (user === null) ? (
         <div>
             <Notification notification={notificationMessage} warning={notificationWarning} />
@@ -99,8 +129,16 @@ const App = () => {
             <Togglable buttonLabel='new blog' ref={blogFormRef}>
                 <BlogForm handleNewBlog={handleNewBlog} />
             </Togglable>
-            {blogs.map(blog =>
-                <Blog key={blog.id} blog={blog} />
+            {blogs
+                .sort((blog1, blog2) => blog2.likes - blog1.likes)
+                .map(blog =>
+                    <Blog
+                        key={blog.id}
+                        blog={blog}
+                        userid={user.id}
+                        incrementLikes={() => incrementLikes(blog.id)}
+                        removeBlog={() => removeBlog(blog)}
+                />
             )}
         </div>
     )
