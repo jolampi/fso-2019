@@ -23,11 +23,11 @@ const Blog = ({ blog, userid, incrementLikes, removeBlog }) => {
     }
 
     return (
-        <div style={blogStyle}>
-            <div onClick={() => toggleDetailed()}>
+        <div className='blog' style={blogStyle}>
+            <div className='blogTitle' onClick={() => toggleDetailed()}>
                 {blog.title} {blog.author}
             </div>
-            <div style={detailedView}>
+            <div className='blogDetails' style={detailedView}>
                 {blog.url} <br />
                 {blog.likes} likes
                 <button onClick={incrementLikes}>like</button> <br />
