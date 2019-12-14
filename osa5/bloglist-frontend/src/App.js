@@ -123,17 +123,20 @@ const App = () => {
             <Togglable buttonLabel='new blog' ref={blogFormRef}>
                 <BlogForm handleNewBlog={handleNewBlog} />
             </Togglable>
-            {blogs
-                .sort((blog1, blog2) => blog2.likes - blog1.likes)
-                .map(blog =>
-                    <Blog
-                        key={blog.id}
-                        blog={blog}
-                        userid={user.id}
-                        incrementLikes={() => incrementLikes(blog.id)}
-                        removeBlog={() => removeBlog(blog)}
-                    />
-                )}
+            <div className='blogs'>
+                {blogs
+                    .sort((blog1, blog2) => blog2.likes - blog1.likes)
+                    .map(blog =>
+                        <Blog
+                            key={blog.id}
+                            blog={blog}
+                            userid={user.id}
+                            incrementLikes={() => incrementLikes(blog.id)}
+                            removeBlog={() => removeBlog(blog)}
+                        />
+                    )
+                }
+            </div>
         </div>
     )
 }

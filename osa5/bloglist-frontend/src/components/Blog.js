@@ -28,11 +28,11 @@ const Blog = ({ blog, userid, incrementLikes, removeBlog }) => {
                 {blog.title} {blog.author}
             </div>
             <div className='blogDetails' style={detailedView}>
-                {blog.url} <br />
-                {blog.likes} likes
-                <button onClick={incrementLikes}>like</button> <br />
-                added by {blog.user ? blog.user.name : 'NaN'} <br />
-                <button  onClick={removeBlog} style={removeButtonStyle}>remove</button>
+                <div>{blog.url}</div>
+                <div>{blog.likes} likes</div>
+                <div><button onClick={incrementLikes}>like</button></div>
+                <div>added by {blog.user ? blog.user.name : 'NaN'}</div>
+                <div><button onClick={removeBlog} style={removeButtonStyle}>remove</button></div>
             </div>
         </div>
     )

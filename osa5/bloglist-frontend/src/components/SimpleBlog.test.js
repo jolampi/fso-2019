@@ -15,7 +15,7 @@ describe('<SimpleBlog />', () => {
 
     beforeEach(() => {
         mockOnClick = jest.fn()
-        component = render (
+        component = render(
             <SimpleBlog blog={blog} onClick={mockOnClick} />
         )
     })

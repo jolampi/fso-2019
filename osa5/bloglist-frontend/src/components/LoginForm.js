@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 const LoginForm = ({ onSubmit, setUsername, setPassword, username, password }) => (
-    <div>
+    <div className='loginForm'>
         <h2>Log in to application</h2>
         <form onSubmit={onSubmit}>
             <div>
