@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useField } from './hooks'
 
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
@@ -10,12 +11,13 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 
 const App = () => {
-    const [username, setUsername] = useState('')
-    const [password, setPassword] = useState('')
+    const username = useField('text')
+    const password = useField('password')
     const [user, setUser] = useState(null)
     const [blogs, setBlogs] = useState([])
+    const [notificationMessage, setNotificationMessage] = useState(null)
+    const [notificationWarning, setNotificationWarning] = useState(false)
     const blogFormRef = React.createRef()
-    const notificationRef = React.createRef()
 
     useEffect(() => {
         const loadBlogs = (async () => {
@@ -36,11 +38,14 @@ const App = () => {
     const handleLogin = async (event) => {
         event.preventDefault()
         try {
-            const user = await loginService.login({ username, password })
+            const user = await loginService.login({
+                username: username.props.value,
+                password: password.props.value
+            })
             window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
             setUser(user)
-            setUsername('')
-            setPassword('')
+            username.reset()
+            password.reset()
             handleNotification('succesfully logged in', false)
         } catch(exception) {
             handleNotification('wrong username or password', true)
@@ -68,7 +73,11 @@ const App = () => {
     }
 
     const handleNotification = (message, warning) => {
-        notificationRef.current.setNotification(message, warning)
+        setNotificationMessage(message)
+        setNotificationWarning(warning || false)
+        setTimeout(() => {
+            setNotificationMessage(null)
+        }, 5000)
     }
 
     // maybe refactor this to use object reference
@@ -101,21 +110,21 @@ const App = () => {
         }
     }
 
+    const notification = <Notification message={notificationMessage} warning={notificationWarning} />
+
     return (user === null) ? (
         <div>
-            <Notification ref={notificationRef} />
+            {notification}
             <LoginForm
                 onSubmit={handleLogin}
-                username={username}
-                setUsername={setUsername}
-                password={password}
-                setPassword={setPassword}
+                username={username.props}
+                password={password.props}
             />
         </div>
     ) : (
         <div>
             <h2>blogs</h2>
-            <Notification ref={notificationRef} />
+            {notification}
             <p>
                 {user.name} logged in
                 <button onClick={handleLogout}>logout</button>

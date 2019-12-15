@@ -1,8 +1,7 @@
-import React, { useState, useImperativeHandle } from 'react'
+import React from 'react'
+import PropTypes from 'prop-types'
 
-const Notification = React.forwardRef((props, ref) => {
-    const [message, setMessage] = useState(null)
-    const [warning, setWarning] = useState(false)
+const Notification = ({ message, warning }) => {
 
     const notificationStyle = {
         color: 'green',
@@ -16,21 +15,14 @@ const Notification = React.forwardRef((props, ref) => {
 
     const warningStyle = { ...notificationStyle, color: 'red' }
 
-    const setNotification = (message, warning) => {
-        setMessage(message)
-        setWarning(warning)
-        setTimeout(() => {
-            setMessage(null)
-        }, 5000)
-    }
-
-    useImperativeHandle(ref, () => {
-        return { setNotification }
-    })
-
     if (message === null) { return null }
 
     return <div style={ warning ? warningStyle : notificationStyle }>{message}</div>
-})
+}
+
+Notification.propTypes = {
+    message: PropTypes.string,
+    warning: PropTypes.bool
+}
 
 export default Notification
