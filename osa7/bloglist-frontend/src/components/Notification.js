@@ -1,4 +1,5 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 
 const Notification = ({ message, warning }) => {
@@ -15,14 +16,21 @@ const Notification = ({ message, warning }) => {
 
     const warningStyle = { ...notificationStyle, color: 'red' }
 
-    if (message === null) { return null }
+    if (message === '') { return null }
 
     return <div style={ warning ? warningStyle : notificationStyle }>{message}</div>
 }
 
 Notification.propTypes = {
-    message: PropTypes.string,
-    warning: PropTypes.bool
+    message: PropTypes.string.isRequired,
+    warning: PropTypes.bool.isRequired
 }
 
-export default Notification
+const mapStateToProps = (state) => {
+    return {
+        message: state.notification.message,
+        warning: state.notification.warning
+    }
+}
+
+export default connect(mapStateToProps)(Notification)

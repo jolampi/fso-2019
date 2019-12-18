@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { useField } from './hooks'
+import { connect } from 'react-redux'
 
+import { setNotification } from './reducers/notificationReducer'
+
+import { useField } from './hooks'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
@@ -10,13 +13,11 @@ import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
-const App = () => {
+const App = (props) => {
     const username = useField('text')
     const password = useField('password')
     const [user, setUser] = useState(null)
     const [blogs, setBlogs] = useState([])
-    const [notificationMessage, setNotificationMessage] = useState(null)
-    const [notificationWarning, setNotificationWarning] = useState(false)
     const blogFormRef = React.createRef()
 
     useEffect(() => {
@@ -73,11 +74,7 @@ const App = () => {
     }
 
     const handleNotification = (message, warning) => {
-        setNotificationMessage(message)
-        setNotificationWarning(warning || false)
-        setTimeout(() => {
-            setNotificationMessage(null)
-        }, 5000)
+        props.setNotification(message, warning, 10)
     }
 
     // maybe refactor this to use object reference
@@ -110,11 +107,9 @@ const App = () => {
         }
     }
 
-    const notification = <Notification message={notificationMessage} warning={notificationWarning} />
-
     return (user === null) ? (
         <div>
-            {notification}
+            <Notification />
             <LoginForm
                 onSubmit={handleLogin}
                 username={username.props}
@@ -124,7 +119,7 @@ const App = () => {
     ) : (
         <div>
             <h2>blogs</h2>
-            {notification}
+            <Notification />
             <p>
                 {user.name} logged in
                 <button onClick={handleLogout}>logout</button>
@@ -150,4 +145,4 @@ const App = () => {
     )
 }
 
-export default App
+export default connect(null, { setNotification })(App)
