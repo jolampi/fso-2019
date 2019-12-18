@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import PropTypes from 'prop-types'
 import { incrementLikes, removeBlog } from '../reducers/blogReducer'
 import Blog from './Blog'
 
@@ -7,7 +8,7 @@ import Blog from './Blog'
 const BlogList = (props) => {
     const handleRemove = (blog) => {
         if (window.confirm(`Remove ${blog.title}?`)) {
-            props.removeBlog(blog)
+            props.removeBlog(blog, props.user.token)
         }
     }
 
@@ -19,7 +20,7 @@ const BlogList = (props) => {
                     <Blog
                         key={blog.id}
                         blog={blog}
-                        isOwner={false}
+                        isOwner={blog.user.id === props.user.id}
                         incrementLikes={() => props.incrementLikes(blog)}
                         removeBlog={() => {handleRemove(blog)}}
                     />
@@ -29,8 +30,16 @@ const BlogList = (props) => {
     )
 }
 
+BlogList.propTypes = {
+    blogs: PropTypes.array.isRequired,
+    user: PropTypes.object.isRequired,
+    incrementLikes: PropTypes.func.isRequired,
+    removeBlog: PropTypes.func.isRequired
+}
+
 const mapStateToProps = (state) => ({
-    blogs: state.blogs
+    blogs: state.blogs,
+    user: state.user
 })
 
 export default connect(

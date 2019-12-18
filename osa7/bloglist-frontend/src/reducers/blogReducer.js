@@ -42,22 +42,25 @@ export const createBlog = (blogObject, token) => {
     }
 }
 
-export const incrementLikes = (blogObject) => {
+export const incrementLikes = (blogToUpdate) => {
     return async (dispatch) => {
         try {
-            const newObject = { ...blogObject,  likes: blogObject.likes + 1 }
+            const newObject = { ...blogToUpdate,  likes: blogToUpdate.likes + 1 }
             delete newObject.id
-            const data = await blogService.update(blogObject.id, newObject)
+            const data = await blogService.update(blogToUpdate.id, newObject)
             dispatch({ type: 'LIKE_BLOG', data })
-        } catch(exeption) { errorDispatch(blogObject, dispatch) }
+        } catch(exeption) { errorDispatch(blogToUpdate, dispatch) }
     }
 }
 
-export const removeBlog = (blogObject) => {
+export const removeBlog = (blogToRemove, token) => {
     return async (dispatch) => {
         try {
-            await blogService.remove(blogObject.id, 'token')
-            dispatch({ type: 'REMOVE_BLOG', blogObject })
-        } catch(exeption) { errorDispatch(blogObject, dispatch) }
+            await blogService.remove(blogToRemove.id, token)
+            dispatch({ type: 'REMOVE_BLOG', data: blogToRemove })
+            dispatch(setNotification(`Removed '${blogToRemove.title}'`, false, 10))
+        } catch(exeption) {
+            errorDispatch(blogToRemove, dispatch)
+        }
     }
 }

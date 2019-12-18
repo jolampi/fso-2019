@@ -23,8 +23,7 @@ const remove = async (id, token) => {
     const config = {
         headers: { Authorization: `bearer ${token}` }
     }
-    const response = await axios.delete(`${baseUrl}/${id}`, config)
-    return response.data
+    await axios.delete(`${baseUrl}/${id}`, config)
 }
 
 export default { getAll, create, update, remove }
