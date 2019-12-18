@@ -37,8 +37,11 @@ export const initializeBlogs = () => {
 
 export const createBlog = (blogObject, token) => {
     return async (dispatch) => {
-        const data = await blogService.create(blogObject, token)
-        dispatch({ type: 'CREATE_BLOG', data })
+        try {
+            const data = await blogService.create(blogObject, token)
+            dispatch({ type: 'CREATE_BLOG', data })
+            dispatch(setNotification(`a new blog ${blogObject.title} added`, false, 10))
+        } catch(exception) { dispatch(setNotification(exception.response.data.error, true, 10)) }
     }
 }
 
@@ -49,7 +52,7 @@ export const incrementLikes = (blogToUpdate) => {
             delete newObject.id
             const data = await blogService.update(blogToUpdate.id, newObject)
             dispatch({ type: 'LIKE_BLOG', data })
-        } catch(exeption) { errorDispatch(blogToUpdate, dispatch) }
+        } catch(exception) { errorDispatch(blogToUpdate, dispatch) }
     }
 }
 
@@ -59,7 +62,7 @@ export const removeBlog = (blogToRemove, token) => {
             await blogService.remove(blogToRemove.id, token)
             dispatch({ type: 'REMOVE_BLOG', data: blogToRemove })
             dispatch(setNotification(`Removed '${blogToRemove.title}'`, false, 10))
-        } catch(exeption) {
+        } catch(exception) {
             errorDispatch(blogToRemove, dispatch)
         }
     }

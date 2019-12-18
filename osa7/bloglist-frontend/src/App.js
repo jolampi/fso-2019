@@ -1,8 +1,7 @@
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 
-import { createBlog, initializeBlogs } from './reducers/blogReducer'
-import { setNotification } from './reducers/notificationReducer'
+import { initializeBlogs } from './reducers/blogReducer'
 import {  clearUser, login, setUser } from './reducers/userReducer'
 
 import { useField } from './hooks'
@@ -36,22 +35,6 @@ const App = (props) => {
         resetPasswordField()
     }
 
-    const handleNewBlog = async (blogObject) => {
-        let success = true
-        try {
-            await props.createBlog(blogObject, props.user.token)
-            handleNotification(`a new blog ${blogObject.title} added`, false)
-        } catch(exception) {
-            handleNotification(exception.response.data.error, true)
-            success = false
-        }
-        return success
-    }
-
-    const handleNotification = (message, warning) => {
-        props.setNotification(message, warning, 10)
-    }
-
     return (props.user === null) ? (
         <div>
             <Notification />
@@ -70,7 +53,7 @@ const App = (props) => {
                 <button onClick={() => props.clearUser()}>logout</button>
             </p>
             <Togglable buttonLabel='new blog' ref={blogFormRef}>
-                <BlogForm handleNewBlog={handleNewBlog} />
+                <BlogForm blogFormRef={blogFormRef} />
             </Togglable>
             <BlogList />
         </div>
@@ -83,5 +66,5 @@ const mapStateToProps = (state) => ({
 
 export default connect(
     mapStateToProps,
-    { createBlog, initializeBlogs, setNotification, setUser, clearUser, login }
+    { initializeBlogs, setUser, clearUser, login }
 )(App)
