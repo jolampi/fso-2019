@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import { createAnecdote } from '../reducers/anecdoteReducer'
 import { setFilter } from '../reducers/filterReducer'
 import { setNotification } from '../reducers/notificationReducer'
-import noteService from '../services/anecdotes'
 
 const AnecdoteForm = (props) => {
 
@@ -11,8 +10,7 @@ const AnecdoteForm = (props) => {
         event.preventDefault()
         const content = event.target.anecdote.value
         event.target.anecdote.value = ''
-        const newAnecdote = await noteService.create(content)
-        props.createAnecdote(newAnecdote)
+        props.createAnecdote(content)
         props.setFilter()
         props.setNotification(`created anecdote '${content}'`)
         setTimeout(() => props.setNotification(''), 5000)

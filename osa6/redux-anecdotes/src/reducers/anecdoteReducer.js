@@ -1,9 +1,9 @@
+import anecdoteService from '../services/anecdotes'
 
 const reducer = (state = [], action) => {
     switch(action.type) {
         case 'CREATE':
-            return state
-                .concat(action.data)
+            return state.concat(action.data)
         case 'VOTE': {
             const anecdoteToChange = state.find(a => a.id === action.data.id)
             const changedAnecdote = { ...anecdoteToChange, votes: anecdoteToChange.votes + 1 }
@@ -25,12 +25,16 @@ export const incrementVotes = (id) => ({
     data: { id }
 })
 
-export const createAnecdote = (data) => ({
-    type: 'CREATE',
-    data
-})
+export const createAnecdote = (content) => {
+    return async (dispatch) => {
+        const data = await anecdoteService.create(content)
+        dispatch({ type: 'CREATE', data })
+    }
+}
 
-export const initializeAnecdotes = (data) => ({
-    type: 'INIT_ANECDOTES',
-    data
-})
+export const initializeAnecdotes = () => {
+    return async (dispatch) => {
+        const data = await anecdoteService.getAll()
+        dispatch({ type: 'INIT_ANECDOTES', data })
+    }
+}
