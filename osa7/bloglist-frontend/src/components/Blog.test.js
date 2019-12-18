@@ -21,7 +21,7 @@ describe('<Blog />', () => {
         component = render(
             <Blog
                 blog={blog}
-                userid='abcd123'
+                isOwner={true}
                 incrementLikes={() => {}}
                 removeBlog={() => {}}
             />

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 
-const Blog = ({ blog, userid, incrementLikes, removeBlog }) => {
+const Blog = ({ blog, isOwner, incrementLikes, removeBlog }) => {
     const [detailed, setDetailed] = useState(false)
 
     const toggleDetailed = () => { setDetailed(!detailed) }
@@ -19,7 +19,7 @@ const Blog = ({ blog, userid, incrementLikes, removeBlog }) => {
 
     const removeButtonStyle = {
         background: 'lightblue',
-        display: (blog.user.id === userid) ? '' : 'none'
+        display: (isOwner) ? '' : 'none'
     }
 
     return (
@@ -40,7 +40,7 @@ const Blog = ({ blog, userid, incrementLikes, removeBlog }) => {
 
 Blog.propTypes = {
     blog: PropTypes.object.isRequired,
-    userid: PropTypes.string.isRequired,
+    isOwner: PropTypes.bool.isRequired,
     incrementLikes: PropTypes.func.isRequired,
     removeBlog: PropTypes.func.isRequired
 }

@@ -1,31 +1,26 @@
 import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 
+import { createBlog, initializeBlogs } from './reducers/blogReducer'
 import { setNotification } from './reducers/notificationReducer'
 
 import { useField } from './hooks'
-import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
+import BlogList from './components/BlogList'
 import LoginForm from './components/LoginForm'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 
-import blogService from './services/blogs'
 import loginService from './services/login'
 
 const App = (props) => {
     const username = useField('text')
     const password = useField('password')
     const [user, setUser] = useState(null)
-    const [blogs, setBlogs] = useState([])
     const blogFormRef = React.createRef()
 
     useEffect(() => {
-        const loadBlogs = (async () => {
-            const blogs = await blogService.getAll()
-            setBlogs(blogs)
-        })
-        loadBlogs()
+        props.initializeBlogs()
     }, [])
 
     useEffect(() => {
@@ -62,10 +57,8 @@ const App = (props) => {
     const handleNewBlog = async (blogObject) => {
         let success = true
         try {
-            const createdBlog = await blogService.create(blogObject, user.token)
-            blogFormRef.current.toggleVisibility()
-            setBlogs(blogs.concat(createdBlog))
-            handleNotification(`a new blog ${createdBlog.title} added`, false)
+            await props.createBlog(blogObject, user.token)
+            handleNotification(`a new blog ${blogObject.title} added`, false)
         } catch(exception) {
             handleNotification(exception.response.data.error, true)
             success = false
@@ -75,36 +68,6 @@ const App = (props) => {
 
     const handleNotification = (message, warning) => {
         props.setNotification(message, warning, 10)
-    }
-
-    // maybe refactor this to use object reference
-    const incrementLikes = async (id) => {
-        const blog = blogs.find(b => b.id === id)
-        const changedBlog = {
-            ...blog,
-            user: blog.user.id,
-            likes: blog.likes + 1
-        }
-        try {
-            const updatedBlog = await blogService.update(id, changedBlog)
-            setBlogs(blogs.map(blog => blog.id !== id ? blog : updatedBlog))
-        } catch(exception) {
-            handleNotification(`the blog '${blog.title}' was already deleted from server`, true)
-            setBlogs(blogs.filter(blog => blog.id !== id))
-        }
-    }
-
-    const removeBlog = async (blogToRemove) => {
-        if (window.confirm(`Remove ${blogToRemove.title}?`)) {
-            try {
-                await blogService.remove(blogToRemove.id, user.token)
-                setBlogs(blogs.filter(blog => blog.id !== blogToRemove.id))
-                handleNotification(`Removed ${blogToRemove.title}`, false)
-            } catch(exception) {
-                handleNotification(`the blog '${blogToRemove.title}' was already deleted from server`, true)
-                setBlogs(blogs.filter(blog => blog.id !== blogToRemove.id))
-            }
-        }
     }
 
     return (user === null) ? (
@@ -127,22 +90,12 @@ const App = (props) => {
             <Togglable buttonLabel='new blog' ref={blogFormRef}>
                 <BlogForm handleNewBlog={handleNewBlog} />
             </Togglable>
-            <div className='blogs'>
-                {blogs
-                    .sort((blog1, blog2) => blog2.likes - blog1.likes)
-                    .map(blog =>
-                        <Blog
-                            key={blog.id}
-                            blog={blog}
-                            userid={user.id}
-                            incrementLikes={() => incrementLikes(blog.id)}
-                            removeBlog={() => removeBlog(blog)}
-                        />
-                    )
-                }
-            </div>
+            <BlogList />
         </div>
     )
 }
 
-export default connect(null, { setNotification })(App)
+export default connect(
+    null,
+    { createBlog, initializeBlogs, setNotification }
+)(App)

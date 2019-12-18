@@ -1,6 +1,8 @@
 import React from 'react'
+import { Provider } from 'react-redux'
 import { render, waitForElement } from '@testing-library/react'
 import App from './App'
+import store from './store'
 
 const user = {
     username: 'secretAgent007',
@@ -12,9 +14,9 @@ const user = {
 describe('<App />', () => {
     test('if no user logged, notes are not rendered', async () => {
         const component = render(
-            <App />
+            <Provider store={store}><App /></Provider>
         )
-        component.rerender(<App />)
+        //component.rerender(<App />)
 
         await waitForElement(
             () => component.container.querySelector('.loginForm')
@@ -30,9 +32,9 @@ describe('<App />', () => {
     test('If user is logged in, notes are rendered', async () => {
         localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
         const component = render(
-            <App />
+            <Provider store={store}><App /></Provider>
         )
-        component.rerender(<App />)
+        //component.rerender(<App />)
 
         await waitForElement(
             () => component.getByText('blogs')
