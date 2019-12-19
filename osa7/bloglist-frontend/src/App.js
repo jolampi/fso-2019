@@ -1,15 +1,18 @@
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
+import { BrowserRouter as Router, Link, Route } from 'react-router-dom'
 
+import { useField } from './hooks'
 import { initializeBlogs } from './reducers/blogReducer'
 import {  clearUser, login, setUser } from './reducers/userReducer'
 
-import { useField } from './hooks'
 import BlogForm from './components/BlogForm'
 import BlogList from './components/BlogList'
 import LoginForm from './components/LoginForm'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
+import User from './components/User'
+import UserList from './components/UserList'
 
 const App = (props) => {
     const [username, resetUsernameField] = useField('text')
@@ -18,6 +21,7 @@ const App = (props) => {
 
     useEffect(() => {
         props.initializeBlogs()
+    // eslint-disable-next-line
     }, [])
 
     useEffect(() => {
@@ -26,6 +30,7 @@ const App = (props) => {
             const user = JSON.parse(loggedUserJSON)
             props.setUser(user)
         }
+    // eslint-disable-next-line
     }, [])
 
     const handleLogin = async (event) => {
@@ -34,6 +39,8 @@ const App = (props) => {
         resetUsernameField()
         resetPasswordField()
     }
+
+    const padding = { padding: 7 }
 
     return (props.user === null) ? (
         <div>
@@ -46,16 +53,28 @@ const App = (props) => {
         </div>
     ) : (
         <div>
-            <h2>blogs</h2>
-            <Notification />
-            <p>
-                {props.user.name} logged in
-                <button onClick={() => props.clearUser()}>logout</button>
-            </p>
-            <Togglable buttonLabel='new blog' ref={blogFormRef}>
-                <BlogForm blogFormRef={blogFormRef} />
-            </Togglable>
-            <BlogList />
+            <Router>
+                <h2>blogs</h2>
+                <Notification />
+                <div>
+                    <Link style={padding} to="/">Blogs</Link>
+                    <Link style={padding} to="/users">Users</Link>
+                    {props.user.name} logged in
+                    <button onClick={() => props.clearUser()}>logout</button>
+                </div>
+                <Route exact path="/" render={() => (
+                    <div>
+                        <Togglable buttonLabel='new blog' ref={blogFormRef}>
+                            <BlogForm blogFormRef={blogFormRef} />
+                        </Togglable>
+                        <BlogList />
+                    </div>
+                )} />
+                <Route exact path="/users" render={() => <UserList />} />
+                <Route exact path="/users/:id" render={({ match }) =>
+                    <User id={match.params.id} />
+                } />
+            </Router>
         </div>
     )
 }
