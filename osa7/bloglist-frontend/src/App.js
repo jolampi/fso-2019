@@ -6,6 +6,7 @@ import { useField } from './hooks'
 import { initializeBlogs } from './reducers/blogReducer'
 import {  clearUser, login, setUser } from './reducers/userReducer'
 
+import { ConnectedBlog as Blog } from './components/Blog'
 import BlogForm from './components/BlogForm'
 import BlogList from './components/BlogList'
 import LoginForm from './components/LoginForm'
@@ -70,6 +71,7 @@ const App = (props) => {
                         <BlogList />
                     </div>
                 )} />
+                <Route exact path="/blogs/:id" render={() => <Blog />} />
                 <Route exact path="/users" render={() => <UserList />} />
                 <Route exact path="/users/:id" render={({ match }) =>
                     <User id={match.params.id} />

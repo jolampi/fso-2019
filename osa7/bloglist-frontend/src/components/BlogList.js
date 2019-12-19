@@ -1,31 +1,36 @@
 import React from 'react'
-import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
 import { incrementLikes, removeBlog } from '../reducers/blogReducer'
-import Blog from './Blog'
-
 
 const BlogList = (props) => {
-    const handleRemove = (blog) => {
-        if (window.confirm(`Remove ${blog.title}?`)) {
-            props.removeBlog(blog, props.user.token)
-        }
+    const blogStyle = {
+        paddingTop: 10,
+        paddingLeft: 2,
+        border: 'solid',
+        borderColor: 'lightgrey',
+        borderWidth: 1,
+        marginBottom: 5
+    }
+
+    const listStyle = {
+        paddingLeft: 0,
+        listStyleType: 'none'
     }
 
     return (
-        <div className='blogs'>
-            {props.blogs
-                .sort((blog1, blog2) => blog2.likes - blog1.likes)
-                .map(blog =>
-                    <Blog
-                        key={blog.id}
-                        blog={blog}
-                        isOwner={blog.user.id === props.user.id}
-                        incrementLikes={() => props.incrementLikes(blog)}
-                        removeBlog={() => {handleRemove(blog)}}
-                    />
-                )
-            }
+        <div>
+            <ul style={listStyle}>
+                {props.blogs
+                    .sort((blog1, blog2) => blog2.likes - blog1.likes)
+                    .map(blog =>
+                        <li key={blog.id} style={blogStyle}>
+                            <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
+                        </li>
+                    )
+                }
+            </ul>
         </div>
     )
 }

@@ -21,13 +21,6 @@ const reducer = (state = [], action) => {
 
 export default reducer
 
-const errorDispatch = (blog, dispatch) => {
-    dispatch(setNotification(
-        `the blog '${blog.title}' was already deleted from server`, true, 10
-    ))
-    dispatch({ type: 'FILTER_INVALID', data: blog })
-}
-
 export const initializeBlogs = () => {
     return async (dispatch) => {
         const data = await blogService.getAll()
@@ -45,25 +38,47 @@ export const createBlog = (blogObject, token) => {
     }
 }
 
-export const incrementLikes = (blogToUpdate) => {
+const handleMissingFromServer = (blog, dispatch) => {
+    dispatch(setNotification(
+        `the blog '${blog.title}' was already deleted from server`, true, 10
+    ))
+    dispatch({ type: 'FILTER_INVALID', data: blog })
+}
+
+export const incrementLikes = (blogToUpdate, callback) => {
+    let result = true
     return async (dispatch) => {
         try {
             const newObject = { ...blogToUpdate,  likes: blogToUpdate.likes + 1 }
             delete newObject.id
             const data = await blogService.update(blogToUpdate.id, newObject)
             dispatch({ type: 'LIKE_BLOG', data })
-        } catch(exception) { errorDispatch(blogToUpdate, dispatch) }
+        } catch(exception) {
+            result = false
+            handleMissingFromServer(blogToUpdate, dispatch)
+        }
+        if (callback) { callback(result) }
     }
 }
 
-export const removeBlog = (blogToRemove, token) => {
+export const removeBlog = (blogToRemove, token, callback) => {
+    let result = true
     return async (dispatch) => {
         try {
             await blogService.remove(blogToRemove.id, token)
             dispatch({ type: 'REMOVE_BLOG', data: blogToRemove })
             dispatch(setNotification(`Removed '${blogToRemove.title}'`, false, 10))
         } catch(exception) {
-            errorDispatch(blogToRemove, dispatch)
+            result = false
+            // console.log(exception.response)
+            if (exception.response.status === 401) {
+                dispatch(
+                    setNotification('You don\t have a permission to remove this blog', true, 10)
+                )
+            } else {
+                handleMissingFromServer(blogToRemove, dispatch)
+            }
         }
+        if (callback) { callback(result) }
     }
 }
