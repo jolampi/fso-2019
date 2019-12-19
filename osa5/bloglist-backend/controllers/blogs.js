@@ -49,8 +49,9 @@ blogRouter.delete('/:id', async (request, response, next) => {
         if (blog.user.toString() === decodedToken.id.toString()) {
             await Blog.findByIdAndRemove(request.params.id)
             response.status(204).end()
+        } else {
+            response.status(401).json({ error: 'Unauthorized document removal request' })
         }
-        response.status(401).json({ error: 'Unauthorized document removal request' })
     } catch(exception) {
         next(exception)
     }
