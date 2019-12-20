@@ -12,7 +12,7 @@ import BlogList from './components/BlogList'
 import LoginForm from './components/LoginForm'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
-import User from './components/User'
+import { ConnectedUser as User } from './components/User'
 import UserList from './components/UserList'
 
 const App = (props) => {
@@ -73,9 +73,7 @@ const App = (props) => {
                 )} />
                 <Route exact path="/blogs/:id" render={() => <Blog />} />
                 <Route exact path="/users" render={() => <UserList />} />
-                <Route exact path="/users/:id" render={({ match }) =>
-                    <User id={match.params.id} />
-                } />
+                <Route exact path="/users/:id" render={() => <User />} />
             </Router>
         </div>
     )

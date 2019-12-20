@@ -1,9 +1,11 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 
 const User = (props) => (
     (!props.user) ? null : (
-        <div>
+        <div className="user">
             <h2>{props.user.name}</h2>
             <h3>added blogs</h3>
             <ul>
@@ -14,6 +16,18 @@ const User = (props) => (
         </div>
     )
 )
+
+User.defaultTypes = {
+    user: null
+}
+
+User.propTypes = {
+    user: PropTypes.object
+}
+
+export default User
+
+
 
 const mapStateToProps = (state, ownProps) => {
     const usersFromBlogs = (users, blog) => {
@@ -26,8 +40,10 @@ const mapStateToProps = (state, ownProps) => {
     return {
         user: Array
             .from(state.blogs.reduce(usersFromBlogs, new Map()).values())
-            .find(user => user.id === ownProps.id)
+            .find(user => user.id === ownProps.match.params.id)
     }
 }
 
-export default connect(mapStateToProps)(User)
+export const ConnectedUser = withRouter(
+    connect(mapStateToProps)(User)
+)
