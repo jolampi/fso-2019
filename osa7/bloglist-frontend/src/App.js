@@ -1,10 +1,9 @@
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 import { BrowserRouter as Router, Link, Route } from 'react-router-dom'
-
-import { useField } from './hooks'
 import { initializeBlogs } from './reducers/blogReducer'
-import {  clearUser, login, setUser } from './reducers/userReducer'
+import {  login, logout, setSessionUser } from './reducers/loginReducer'
+import { useField } from './hooks'
 
 import { ConnectedBlog as Blog } from './components/Blog'
 import BlogForm from './components/BlogForm'
@@ -29,7 +28,7 @@ const App = (props) => {
         const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
         if (loggedUserJSON) {
             const user = JSON.parse(loggedUserJSON)
-            props.setUser(user)
+            props.setSessionUser(user)
         }
     // eslint-disable-next-line
     }, [])
@@ -61,7 +60,7 @@ const App = (props) => {
                     <Link style={padding} to="/">Blogs</Link>
                     <Link style={padding} to="/users">Users</Link>
                     {props.user.name} logged in
-                    <button onClick={() => props.clearUser()}>logout</button>
+                    <button onClick={() => props.logout()}>logout</button>
                 </div>
                 <Route exact path="/" render={() => (
                     <div>
@@ -85,5 +84,5 @@ const mapStateToProps = (state) => ({
 
 export default connect(
     mapStateToProps,
-    { initializeBlogs, setUser, clearUser, login }
+    { initializeBlogs, login, logout, setSessionUser }
 )(App)

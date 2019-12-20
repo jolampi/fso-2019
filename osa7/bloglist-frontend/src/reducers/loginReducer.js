@@ -27,11 +27,11 @@ export const login = (username, password) => {
     }
 }
 
-export const setUser = (data) => ({ type: 'SET_USER', data })
-
-export const clearUser = () => {
+export const logout = () => {
     return async (dispatch) => {
         window.localStorage.clear()
         dispatch({ type: 'CLEAR_USER' })
     }
 }
+
+export const setSessionUser = (data) => ({ type: 'SET_USER', data })
