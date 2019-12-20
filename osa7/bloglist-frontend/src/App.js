@@ -2,7 +2,8 @@ import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 import { BrowserRouter as Router, Link, Route } from 'react-router-dom'
 import { initializeBlogs } from './reducers/blogReducer'
-import {  login, logout, setSessionUser } from './reducers/loginReducer'
+import { login, logout, setSessionUser } from './reducers/loginReducer'
+import { setNotification } from './reducers/notificationReducer'
 import { useField } from './hooks'
 
 import { ConnectedBlog as Blog } from './components/Blog'
@@ -20,9 +21,9 @@ const App = (props) => {
     const blogFormRef = React.createRef()
 
     useEffect(() => {
-        props.initializeBlogs()
+        if (props.user) { props.initializeBlogs() }
     // eslint-disable-next-line
-    }, [])
+    }, [ props.user ])
 
     useEffect(() => {
         const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
@@ -35,9 +36,15 @@ const App = (props) => {
 
     const handleLogin = async (event) => {
         event.preventDefault()
-        await props.login(username.value, password.value)
-        resetUsernameField()
-        resetPasswordField()
+        await props.login(username.value, password.value, (success) => {
+            if (success) {
+                props.setNotification('succesfully logged in', false, 10)
+                resetUsernameField()
+                resetPasswordField()
+            } else {
+                props.setNotification('wrong username or password', true, 10)
+            }
+        })
     }
 
     const padding = { padding: 7 }
@@ -84,5 +91,5 @@ const mapStateToProps = (state) => ({
 
 export default connect(
     mapStateToProps,
-    { initializeBlogs, login, logout, setSessionUser }
+    { initializeBlogs, login, logout, setNotification, setSessionUser }
 )(App)

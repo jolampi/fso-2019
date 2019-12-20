@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { createBlog } from '../reducers/blogReducer'
+import { setNotification } from '../reducers/notificationReducer'
 import { useField } from '../hooks'
 
 const BlogForm = (props) => {
@@ -16,11 +17,17 @@ const BlogForm = (props) => {
             author: author.value,
             url: url.value
         }
-        await props.createBlog(blogObject, props.token)
-        resetTitleField()
-        resetAuthorField()
-        resetUrlField()
-        props.blogFormRef.current.toggleVisibility()
+        await props.createBlog(blogObject, props.token, (success, error) => {
+            if (success) {
+                props.setNotification(`a new blog ${blogObject.title} added`, false, 10)
+                resetTitleField()
+                resetAuthorField()
+                resetUrlField()
+                props.blogFormRef.current.toggleVisibility()
+            } else {
+                props.setNotification(error, true, 10)
+            }
+        })
     }
 
     return (
@@ -55,4 +62,4 @@ const mapStateToProps = (state) => ({
     token: state.user.token
 })
 
-export default connect(mapStateToProps, { createBlog })(BlogForm)
+export default connect(mapStateToProps, { createBlog, setNotification })(BlogForm)

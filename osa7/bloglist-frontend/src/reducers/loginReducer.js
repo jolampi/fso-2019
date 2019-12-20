@@ -1,4 +1,3 @@
-import { setNotification } from './notificationReducer'
 import loginService from '../services/login'
 
 const reducer = (state = null, action) => {
@@ -14,16 +13,15 @@ const reducer = (state = null, action) => {
 
 export default reducer
 
-export const login = (username, password) => {
+export const login = (username, password, callback) => {
     return async (dispatch) => {
+        let success = true
         try {
             const data = await loginService.login({ username, password })
             window.localStorage.setItem('loggedBlogappUser', JSON.stringify(data))
             dispatch({ type: 'SET_USER', data })
-            dispatch(setNotification('succesfully logged in', false, 10))
-        } catch (exception) {
-            dispatch(setNotification('wrong username or password', true, 10))
-        }
+        } catch (exception) { success = false }
+        if (callback) { callback(success) }
     }
 }
 
