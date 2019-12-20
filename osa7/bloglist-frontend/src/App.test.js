@@ -40,7 +40,7 @@ describe('<App />', () => {
             () => component.getByText('blogs')
         )
 
-        const blogs = component.container.querySelectorAll('.blog')
+        const blogs = component.container.querySelectorAll('.blogItem')
         expect(blogs.length).toBe(3)
     })
 })

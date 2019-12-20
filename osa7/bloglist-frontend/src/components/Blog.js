@@ -14,25 +14,36 @@ const Blog = (props) => {
 
     return (!blog) ? null : (
         <div className="blog">
-            <h2>{blog.title}</h2>
+            <h2>
+                {blog.title} {blog.author}
+            </h2>
             <div><a href={blog.url}>{blog.url}</a></div>
             <div>
                 {blog.likes} likes
-                <button onClick={props.onLike}>like</button>
+                <button className="blogLikeButton" onClick={props.onLike}>like</button>
             </div>
             <div>added by {blog.user.name}</div>
             <div>
-                <button onClick={props.onRemove} style={removeButton}>remove</button>
+                <button className="blogRemoveButton" onClick={props.onRemove} style={removeButton}>
+                    remove
+                </button>
             </div>
         </div>
     )
 }
 
+Blog.defaultProps = {
+    blog: null,
+    isRemovable: false,
+    onLike: null,
+    onRemove: null
+}
+
 Blog.propTypes = {
     blog: PropTypes.object,
     isRemovable: PropTypes.bool.isRequired,
-    onLike: PropTypes.func.isRequired,
-    onRemove: PropTypes.func.isRequired
+    onLike: PropTypes.func,
+    onRemove: PropTypes.func
 }
 
 export default Blog

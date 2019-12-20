@@ -25,7 +25,7 @@ const BlogList = (props) => {
                 {props.blogs
                     .sort((blog1, blog2) => blog2.likes - blog1.likes)
                     .map(blog =>
-                        <li key={blog.id} style={blogStyle}>
+                        <li key={blog.id} className="blogItem" style={blogStyle}>
                             <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
                         </li>
                     )
