@@ -5,6 +5,8 @@ import { withRouter } from 'react-router-dom'
 import { incrementLikes, removeBlog } from '../reducers/blogReducer'
 import { setNotification } from '../reducers/notificationReducer'
 
+import { ConnectedCommentForm as CommentForm } from './CommentForm'
+
 const Blog = (props) => {
     const blog = props.blog
 
@@ -29,6 +31,14 @@ const Blog = (props) => {
                     remove
                 </button>
             </div>
+            <h3>comments</h3>
+            <CommentForm blogId={blog.id} />
+            <ul>
+                {blog.comments
+                    .sort((comment1, comment2) => new Date(comment2.date) - new Date(comment1.date))
+                    .map(comment => <li key={comment.id}>{comment.comment}</li>)
+                }
+            </ul>
         </div>
     )
 }
@@ -37,14 +47,16 @@ Blog.defaultProps = {
     blog: null,
     isRemovable: false,
     onLike: null,
-    onRemove: null
+    onRemove: null,
+    comments: []
 }
 
 Blog.propTypes = {
     blog: PropTypes.object,
     isRemovable: PropTypes.bool.isRequired,
     onLike: PropTypes.func,
-    onRemove: PropTypes.func
+    onRemove: PropTypes.func,
+    comments: PropTypes.array.isRequired
 }
 
 export default Blog
@@ -69,7 +81,7 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => {
         dispatchProps.incrementLikes(blog, (success) => {
             if (!success) {
                 dispatchProps
-                    .setNotification(`the blog '${blog.title}' was removed from server`, true, 10)
+                    .setNotification(`the blog '${blog.title}' was already removed from server`, true, 10)
                 ownProps.history.push('/')
             }
         })

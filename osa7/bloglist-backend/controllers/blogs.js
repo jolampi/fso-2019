@@ -43,7 +43,7 @@ blogRouter.post('/', async (request, response, next) => {
 
 blogRouter.post('/:id/comments', async (request, response, next) => {
     const body = request.body
-    if (!body.comment) { return response.status(400).end() }
+    if (!body.comment) { return response.status(400).json({ error: 'missing content' }) }
 
     try {
         const blog = await Blog.findById(request.params.id)
@@ -55,7 +55,9 @@ blogRouter.post('/:id/comments', async (request, response, next) => {
         }
 
         const newComments = { comments: blog.comments.concat(comment) }
-        const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, newComments, { new: true })
+        const updatedBlog = await Blog
+            .findByIdAndUpdate(request.params.id, newComments, { new: true })
+            .populate('user', { username: 1, name: 1 })
         response.json(updatedBlog.toJSON())
 
     } catch(exception) {
