@@ -1,0 +1,6 @@
+POST http://localhost:3003/api/blogs/5dfe0c45367bbd1db0ecd0c9/comments
+Content-Type: application/json
+
+{
+    "comment": "This is the yearly event of the decade!"
+}

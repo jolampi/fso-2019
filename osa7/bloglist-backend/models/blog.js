@@ -14,13 +14,29 @@ const blogSchema = mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
-    }
+    },
+    comments: [
+        {
+            comment: {
+                type: String,
+                required: true
+            },
+            date: {
+                type: Date,
+                required: true
+            }
+        }
+    ]
 })
 
 blogSchema.set('toJSON', {
     transform: (document, returnedObject) => {
         returnedObject.id = returnedObject._id.toString()
         delete returnedObject._id
+        returnedObject.comments.forEach(comment => {
+            comment.id = comment._id.toString()
+            delete comment._id
+        })
         delete returnedObject.__v
     }
 })

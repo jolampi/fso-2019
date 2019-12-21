@@ -41,6 +41,28 @@ blogRouter.post('/', async (request, response, next) => {
     }
 })
 
+blogRouter.post('/:id/comments', async (request, response, next) => {
+    const body = request.body
+    if (!body.comment) { return response.status(400).end() }
+
+    try {
+        const blog = await Blog.findById(request.params.id)
+        if (blog === null) { return response.status(410).json({ error: 'invalid id' }) }
+
+        const comment = (!body.comment) ? {} : {
+            comment: body.comment,
+            date: new Date()
+        }
+
+        const newComments = { comments: blog.comments.concat(comment) }
+        const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, newComments, { new: true })
+        response.json(updatedBlog.toJSON())
+
+    } catch(exception) {
+        next(exception)
+    }
+})
+
 blogRouter.delete('/:id', async (request, response, next) => {
     try {
         const decodedToken = jwt.verify(request.token, process.env.SECRET)
