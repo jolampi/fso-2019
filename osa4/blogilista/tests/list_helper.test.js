@@ -52,12 +52,12 @@ describe('most blogs', () => {
         })
     })
 
-    /*test('in a bigger list is calculated right', () => {
-        expect(listHelper.mostBlogs(blogs.list_1)).toEqual({
+    test('in a bigger list is calculated right', () => {
+        expect(listHelper.mostBlogs(blogs.list_n)).toEqual({
             author: 'Robert C. Martin',
             blogs: 3
         })
-    })*/
+    })
 })
 
 describe('most likes', () => {
@@ -72,10 +72,10 @@ describe('most likes', () => {
         })
     })
 
-    /*test('in a bigger list is calculated right', () => {
-        expect(listHelper.mostLikes(blogs.list_1)).toEqual({
+    test('in a bigger list is calculated right', () => {
+        expect(listHelper.mostLikes(blogs.list_n)).toEqual({
             author: 'Edsger W. Dijkstra',
             likes: 17
         })
-    })*/
+    })
 })

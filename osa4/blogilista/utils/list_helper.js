@@ -14,42 +14,28 @@ const totalLikes = (blogs) => {
     return blogs.reduce(reducer, 0)
 }
 
+const aggregateAuthors = (authors, blog) => {
+    const author = blog.author
+    if (!authors.has(author)) { authors.set(author, { author, blogs: 0, likes: 0 }) }
+    const entry = authors.get(author)
+    authors.set(author, { ...entry, blogs: entry.blogs + 1, likes: entry.likes + blog.likes })
+    return authors
+}
+
 const mostBlogs = (blogs) => {
     if (blogs.length === 0) { return undefined }
-    let authors = []
-    blogs.forEach(blog => {
-        if (!authors[blog.author]) { authors[blog.author] = 0 }
-        authors[blog.author] += 1
-    })
-    let biggest = 0
-    let biggestName = ''
-    for (const [key, value] of Object.entries(authors)) {
-        console.log('I am stupid javascript also', biggest, '>', value)
-        if (parseInt(value) > parseInt(biggest)) {
-            biggestName = key
-            biggest = value
-        }
-    }
-    return { author: biggestName, blogs: biggest }
+    const mostBlogs = Array
+        .from(blogs.reduce(aggregateAuthors, new Map()).values())
+        .sort((author1, author2) => author2.blogs - author1.blogs)[0]
+    return { author: mostBlogs.author, blogs: mostBlogs.blogs }
 }
 
 const mostLikes = (blogs) => {
     if (blogs.length === 0) { return undefined }
-    let authors = []
-    blogs.forEach(blog => {
-        if (!authors[blog.author]) { authors[blog.author] = 0 }
-        authors[blog.author] += blog.likes
-    })
-    let biggest = 0
-    let biggestName = ''
-    for (const [key, value] of Object.entries(authors)) {
-        console.log('I am stupid javascript also', biggest, '>', value)
-        if (parseInt(value) > parseInt(biggest)) {
-            biggestName = key
-            biggest = value
-        }
-    }
-    return { author: biggestName, likes: biggest }
+    const mostBlogs = Array
+        .from(blogs.reduce(aggregateAuthors, new Map()).values())
+        .sort((author1, author2) => author2.likes - author1.likes)[0]
+    return { author: mostBlogs.author, likes: mostBlogs.likes }
 }
 
 module.exports = {
