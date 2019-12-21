@@ -30,9 +30,12 @@ blogRouter.post('/', async (request, response, next) => {
         })
 
         const savedBlog = await blog.save()
-        user.blogs = user.blogs.concat(savedBlog._id)
+        const populatedBlog = await savedBlog
+            .populate('user', { username: 1, name: 1 })
+            .execPopulate()
+        user.blogs = user.blogs.concat(populatedBlog._id)
         await user.save()
-        response.status(201).json(savedBlog.toJSON())
+        response.status(201).json(populatedBlog.toJSON())
     } catch(exception) {
         next(exception)
     }
@@ -46,11 +49,12 @@ blogRouter.delete('/:id', async (request, response, next) => {
         }
 
         const blog = await Blog.findById(request.params.id)
+        if (blog === null) { return response.status(410).json({ error: 'invalid id' }) }
         if (blog.user.toString() === decodedToken.id.toString()) {
             await Blog.findByIdAndRemove(request.params.id)
-            response.status(204).end()
+            return response.status(204).end()
         } else {
-            response.status(401).json({ error: 'Unauthorized document removal request' })
+            return response.status(401).json({ error: 'Unauthorized document removal request' })
         }
     } catch(exception) {
         next(exception)
@@ -66,7 +70,8 @@ blogRouter.put('/:id', async (request, response, next) => {
     try {
         const updatedBlog = await Blog
             .findByIdAndUpdate(request.params.id, blog, { new: true })
-            .populate('user', { username: 1, name: 1 })
+            .populate('user', { username: 'username', name: 'name' })
+        if (updatedBlog === null) { return response.status(410).json({ error: 'invalid id' }) }
         response.json(updatedBlog.toJSON())
     } catch(exception) {
         next(exception)
