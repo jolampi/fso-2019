@@ -70,9 +70,9 @@ const App = (props) => {
                         <Button onClick={() => props.logout()}>logout</Button>
                     </Menu.Item>
                 </Menu>
-                <h2>blogs</h2>
                 <Route exact path="/" render={() => (
                     <div>
+                        <h2>blogs</h2>
                         <Togglable buttonLabel='new blog' ref={blogFormRef}>
                             <BlogForm afterSubmit={() => blogFormRef.current.toggleVisibility()} />
                         </Togglable>

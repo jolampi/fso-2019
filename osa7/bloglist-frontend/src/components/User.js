@@ -3,16 +3,14 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
+import BlogList from './BlogList'
+
 const User = (props) => (
     (!props.user) ? null : (
         <div className="user">
             <h2>{props.user.name}</h2>
             <h3>added blogs</h3>
-            <ul>
-                {props.user.blogs.map(blog =>
-                    <li key={blog.id}>{blog.title}</li>
-                )}
-            </ul>
+            <BlogList blogs={props.user.blogs} />
         </div>
     )
 )

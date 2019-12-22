@@ -36,14 +36,12 @@ const BlogList = (props) => {
 
 BlogList.propTypes = {
     blogs: PropTypes.array.isRequired,
-    user: PropTypes.object.isRequired,
     incrementLikes: PropTypes.func.isRequired,
     removeBlog: PropTypes.func.isRequired
 }
 
-const mapStateToProps = (state) => ({
-    blogs: state.blogs,
-    user: state.user
+const mapStateToProps = (state, ownProps) => ({
+    blogs: ownProps.blogs || state.blogs
 })
 
 export default connect(
