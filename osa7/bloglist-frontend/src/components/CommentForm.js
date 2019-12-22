@@ -4,6 +4,8 @@ import { connect } from 'react-redux'
 import { useField } from '../hooks'
 import { createComment } from '../reducers/blogReducer'
 
+import { Button, Form } from 'semantic-ui-react'
+
 const CommentForm = (props) => {
     const [comment, resetCommentField] = useField('text')
 
@@ -17,10 +19,12 @@ const CommentForm = (props) => {
 
     return (
         <div>
-            <form onSubmit={onSubmit}>
-                <input { ...comment } />
-                <button type="submit">comment</button>
-            </form>
+            <Form onSubmit={onSubmit}>
+                <Form.Field>
+                    <input { ...comment } />
+                </Form.Field>
+                <Button type="submit">comment</Button>
+            </Form>
         </div>
     )
 }

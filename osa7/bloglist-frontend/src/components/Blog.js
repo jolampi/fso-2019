@@ -5,6 +5,7 @@ import { withRouter } from 'react-router-dom'
 import { incrementLikes, removeBlog } from '../reducers/blogReducer'
 import { setNotification } from '../reducers/notificationReducer'
 
+import { Button, List } from 'semantic-ui-react'
 import { ConnectedCommentForm as CommentForm } from './CommentForm'
 
 const Blog = (props) => {
@@ -18,27 +19,30 @@ const Blog = (props) => {
     return (!blog) ? null : (
         <div className="blog">
             <h2>
-                {blog.title} {blog.author}
+                {blog.title}
+                {blog.author && <> - {blog.author}</>}
             </h2>
             <div><a href={blog.url}>{blog.url}</a></div>
             <div>
-                {blog.likes} likes
-                <button className="blogLikeButton" onClick={props.onLike}>like</button>
-            </div>
-            <div>added by {blog.user.name}</div>
-            <div>
-                <button className="blogRemoveButton" onClick={props.onRemove} style={removeButton}>
+                added by {blog.user.name}
+                <Button className="blogRemoveButton" onClick={props.onRemove} style={removeButton}>
                     remove
-                </button>
+                </Button>
+            </div>
+            <div>
+                {blog.likes} likes
+                <Button className="blogLikeButton" onClick={props.onLike}>like</Button>
             </div>
             <h3>comments</h3>
             <CommentForm blogId={blog.id} />
-            <ul>
+            <List as='ul'>
                 {blog.comments
                     .sort((comment1, comment2) => new Date(comment2.date) - new Date(comment1.date))
-                    .map(comment => <li key={comment.id}>{comment.comment}</li>)
+                    .map(comment =>
+                        <List.Item as='li' key={comment.id}>{comment.comment}</List.Item>
+                    )
                 }
-            </ul>
+            </List>
         </div>
     )
 }
