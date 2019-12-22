@@ -5,6 +5,8 @@ import { createBlog } from '../reducers/blogReducer'
 import { setNotification } from '../reducers/notificationReducer'
 import { useField } from '../hooks'
 
+import { Button, Form } from 'semantic-ui-react'
+
 const BlogForm = (props) => {
     const [title, resetTitleField] = useField('text')
     const [author, resetAuthorField] = useField('text')
@@ -23,38 +25,44 @@ const BlogForm = (props) => {
                 resetTitleField()
                 resetAuthorField()
                 resetUrlField()
-                props.blogFormRef.current.toggleVisibility()
+                props.afterSubmit()
             } else {
                 props.setNotification(error, true, 10)
             }
         })
     }
 
+    const onCancel = async (event) => {
+        event.preventDefault()
+        props.afterSubmit()
+    }
+
     return (
-        <div>
+        <>
             <h2>create new</h2>
-            <form onSubmit={onSubmit}>
-                <div>
+            <Form onSubmit={onSubmit}>
+                <Form.Field>
                     title:
                     <input {...title} />
-                </div>
-                <div>
+                </Form.Field>
+                <Form.Field>
                     author:
                     <input {...author} />
-                </div>
-                <div>
+                </Form.Field>
+                <Form.Field>
                     url:
                     <input {...url} />
-                </div>
-                <button type="submit">create</button>
-            </form>
-        </div>
+                </Form.Field>
+                <Button type="submit">create</Button>
+                <Button onClick={onCancel}>cancel</Button>
+            </Form>
+        </>
     )
 }
 
 BlogForm.propTypes = {
-    blogFormRef: PropTypes.object.isRequired,
     token: PropTypes.string.isRequired,
+    afterSubmit: PropTypes.func.isRequired,
     createBlog: PropTypes.func.isRequired
 }
 

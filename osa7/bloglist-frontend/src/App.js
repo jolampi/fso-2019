@@ -6,6 +6,7 @@ import { login, logout, setSessionUser } from './reducers/loginReducer'
 import { setNotification } from './reducers/notificationReducer'
 import { useField } from './hooks'
 
+import { Button, Container, Menu } from 'semantic-ui-react'
 import { ConnectedBlog as Blog } from './components/Blog'
 import BlogForm from './components/BlogForm'
 import BlogList from './components/BlogList'
@@ -47,32 +48,33 @@ const App = (props) => {
         })
     }
 
-    const padding = { padding: 7 }
-
     return (props.user === null) ? (
-        <div>
+        <Container>
             <Notification />
             <LoginForm
                 onSubmit={handleLogin}
                 username={username}
                 password={password}
             />
-        </div>
+        </Container>
     ) : (
-        <div>
+        <Container>
             <Router>
-                <h2>blogs</h2>
                 <Notification />
-                <div>
-                    <Link style={padding} to="/">Blogs</Link>
-                    <Link style={padding} to="/users">Users</Link>
-                    {props.user.name} logged in
-                    <button onClick={() => props.logout()}>logout</button>
-                </div>
+                <Menu inverted>
+                    <Menu.Item link><Link to="/">Blogs</Link></Menu.Item>
+                    <Menu.Item link><Link to="/users">Users</Link></Menu.Item>
+                    <Menu.Item>
+                        {props.user.name} logged in
+
+                        <Button onClick={() => props.logout()}>logout</Button>
+                    </Menu.Item>
+                </Menu>
+                <h2>blogs</h2>
                 <Route exact path="/" render={() => (
                     <div>
                         <Togglable buttonLabel='new blog' ref={blogFormRef}>
-                            <BlogForm blogFormRef={blogFormRef} />
+                            <BlogForm afterSubmit={() => blogFormRef.current.toggleVisibility()} />
                         </Togglable>
                         <BlogList />
                     </div>
@@ -81,7 +83,7 @@ const App = (props) => {
                 <Route exact path="/users" render={() => <UserList />} />
                 <Route exact path="/users/:id" render={() => <User />} />
             </Router>
-        </div>
+        </Container>
     )
 }
 

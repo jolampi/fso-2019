@@ -2,23 +2,17 @@ import React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 
+import { Message } from 'semantic-ui-react'
+
 const Notification = ({ message, warning }) => {
-
-    const notificationStyle = {
-        color: 'green',
-        background: 'lightgrey',
-        fontSize: 20,
-        borderStyle: 'solid',
-        borderRadius: 5,
-        padding: 10,
-        marginBottom: 10
-    }
-
-    const warningStyle = { ...notificationStyle, color: 'red' }
 
     if (message === '') { return null }
 
-    return <div style={ warning ? warningStyle : notificationStyle }>{message}</div>
+    return (!warning) ? (
+        <Message success>{message}</Message>
+    ) : (
+        <Message error>{message}</Message>
+    )
 }
 
 Notification.propTypes = {

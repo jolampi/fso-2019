@@ -4,33 +4,32 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { incrementLikes, removeBlog } from '../reducers/blogReducer'
 
-const BlogList = (props) => {
-    const blogStyle = {
-        paddingTop: 10,
-        paddingLeft: 2,
-        border: 'solid',
-        borderColor: 'lightgrey',
-        borderWidth: 1,
-        marginBottom: 5
-    }
+import { List } from 'semantic-ui-react'
 
-    const listStyle = {
-        paddingLeft: 0,
-        listStyleType: 'none'
+const BlogList = (props) => {
+    const padding = {
+        paddingTop: 8
     }
 
     return (
         <div>
-            <ul style={listStyle}>
+            <List>
                 {props.blogs
                     .sort((blog1, blog2) => blog2.likes - blog1.likes)
                     .map(blog =>
-                        <li key={blog.id} className="blogItem" style={blogStyle}>
-                            <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
-                        </li>
+                        <List.Item key={blog.id} className="blogItem" style={padding}>
+                            <Link to={`/blogs/${blog.id}`}>
+                                <List.Header>
+                                    {blog.title}
+                                    {(blog.author !== '') && <i> - {blog.author}</i>}
+                                </List.Header>
+                                {blog.likes} likes
+                                 · {blog.comments.length} comments
+                            </Link>
+                        </List.Item>
                     )
                 }
-            </ul>
+            </List>
         </div>
     )
 }
