@@ -43,17 +43,17 @@ const BlogForm = (props) => {
             <Form onSubmit={onSubmit}>
                 <Form.Field>
                     title:
-                    <input {...title} />
+                    <input data-cy="blogTitle" {...title} />
                 </Form.Field>
                 <Form.Field>
                     author:
-                    <input {...author} />
+                    <input data-cy="blogAuthor" {...author} />
                 </Form.Field>
                 <Form.Field>
                     url:
-                    <input {...url} />
+                    <input data-cy="blogUrl" {...url} />
                 </Form.Field>
-                <Button type="submit">create</Button>
+                <Button type="submit" data-cy="submit">create</Button>
                 <Button onClick={onCancel}>cancel</Button>
             </Form>
         </>
