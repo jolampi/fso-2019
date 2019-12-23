@@ -50,6 +50,7 @@ const App = (props) => {
 
     return (props.user === null) ? (
         <Container>
+            <h2>blogs</h2>
             <Notification />
             <LoginForm
                 onSubmit={handleLogin}
@@ -60,6 +61,7 @@ const App = (props) => {
     ) : (
         <Container>
             <Router>
+                <h2>blogs</h2>
                 <Notification />
                 <Menu inverted>
                     <Menu.Item link><Link to="/">Blogs</Link></Menu.Item>
@@ -67,12 +69,11 @@ const App = (props) => {
                     <Menu.Item>
                         {props.user.name} logged in
 
-                        <Button onClick={() => props.logout()}>logout</Button>
+                        <Button onClick={() => props.logout()} data-cy="logout">logout</Button>
                     </Menu.Item>
                 </Menu>
                 <Route exact path="/" render={() => (
                     <div>
-                        <h2>blogs</h2>
                         <Togglable buttonLabel='new blog' ref={blogFormRef}>
                             <BlogForm afterSubmit={() => blogFormRef.current.toggleVisibility()} />
                         </Togglable>

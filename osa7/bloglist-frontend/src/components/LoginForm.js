@@ -9,13 +9,13 @@ const LoginForm = ({ onSubmit, username, password }) => (
         <Form onSubmit={onSubmit}>
             <Form.Field>
                 username
-                <input {...username} />
+                <input data-cy="username" {...username} />
             </Form.Field>
             <Form.Field>
                 password
-                <input {...password} />
+                <input data-cy="password" {...password} />
             </Form.Field>
-            <Button type="submit">login</Button>
+            <Button type="submit" data-cy="submit">login</Button>
         </Form>
     </div>
 )
