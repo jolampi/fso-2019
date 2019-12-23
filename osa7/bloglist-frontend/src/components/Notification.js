@@ -9,9 +9,9 @@ const Notification = ({ message, warning }) => {
     if (message === '') { return null }
 
     return (!warning) ? (
-        <Message success>{message}</Message>
+        <Message success data-cy="successNotification">{message}</Message>
     ) : (
-        <Message error>{message}</Message>
+        <Message error data-cy="errorNotification">{message}</Message>
     )
 }
 

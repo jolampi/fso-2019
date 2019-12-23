@@ -9,4 +9,10 @@ router.post('/reset', async (request, response) => {
     return response.status(204).end()
 })
 
+router.post('/reset/blogs', async (request, response) => {
+    await Blog.deleteMany({})
+
+    return response.status(204).end()
+})
+
 module.exports = router
