@@ -21,9 +21,9 @@ const CommentForm = (props) => {
         <div>
             <Form onSubmit={onSubmit}>
                 <Form.Field>
-                    <input { ...comment } />
+                    <input data-cy="commentField" { ...comment } />
                 </Form.Field>
-                <Button type="submit">comment</Button>
+                <Button type="submit" data-cy="commentSubmit">comment</Button>
             </Form>
         </div>
     )

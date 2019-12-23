@@ -63,7 +63,7 @@ const App = (props) => {
             <Router>
                 <h2>blogs</h2>
                 <Notification />
-                <Menu inverted>
+                <Menu inverted data-cy="menu">
                     <Menu.Item link><Link to="/">Blogs</Link></Menu.Item>
                     <Menu.Item link><Link to="/users">Users</Link></Menu.Item>
                     <Menu.Item>

@@ -31,7 +31,9 @@ const Blog = (props) => {
             </div>
             <div>
                 {blog.likes} likes
-                <Button className="blogLikeButton" onClick={props.onLike}>like</Button>
+                <Button className="blogLikeButton" data-cy="like" onClick={props.onLike}>
+                    like
+                </Button>
             </div>
             <h3>comments</h3>
             <CommentForm blogId={blog.id} />
