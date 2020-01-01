@@ -1,4 +1,4 @@
-const { ApolloServer, gql } = require('apollo-server')
+const { ApolloServer, gql, UserInputError } = require('apollo-server')
 const config = require('./utils/config')
 
 const Author = require('./models/author')
@@ -108,24 +108,36 @@ const resolvers = {
             if (author) {
                 authorId = author._id
             } else {
-                const newAuthor = await new Author({ name: args.author }).save()
-                authorId = newAuthor._id
+                try {
+                    const newAuthor = await new Author({ name: args.author }).save()
+                    authorId = newAuthor._id
+                } catch(error) {
+                    throw new UserInputError(error.message, { invalidArgs: [ args.author ] })
+                }
             }
 
-            const book = await new Book({ ...args, author: authorId }).save()
-            const populatedBook = await book.populate('author').execPopulate()
-            
-            return populatedBook
+            try {
+                const book = await new Book({ ...args, author: authorId }).save()
+                const populatedBook = await book.populate('author').execPopulate()
+                
+                return populatedBook
+            } catch(error) {
+                throw new UserInputError(error.message, { invalidArgs: args })
+            }
         },
         editAuthor: async (root, args) => {
             const author = await findAuthorByName(args.name)
 
             if (!author) { return null }
 
-            const updatedAuthor = await Author
-                .findByIdAndUpdate(author.id, { born: args.setBornTo }, { new: true })
-
-            return updatedAuthor
+            try {
+                const updatedAuthor = await Author
+                    .findByIdAndUpdate(author.id, { born: args.setBornTo }, { new: true })
+    
+                return updatedAuthor
+            } catch(error) {
+                throw new UserInputError(error.message, { invalidArgs: args })
+            }
         }
     }
 }
