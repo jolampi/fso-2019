@@ -87,7 +87,6 @@ const App = () => {
         refetchQueries: [{ query: ALL_AUTHORS }]
     })
 
-    const books = useQuery(ALL_BOOKS)
     const [addBook] = useMutation(CREATE_BOOK, {
         onError: () => {},
         refetchQueries: [{ query: ALL_AUTHORS }],
@@ -142,7 +141,7 @@ const App = () => {
                     show={token && page === 'authors'}
                     result={authors}
                     editAuthor={editAuthor} />
-                <Books show={page === 'books'} result={books} />
+                <Books show={page === 'books'} />
                 <LoginForm
                     show={page === 'login'}
                     handleLogin={handleLogin}
