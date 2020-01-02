@@ -27,6 +27,8 @@ const ALL_BOOKS = gql`
             name
         }
         published
+        genres
+        id
     }
 }
 `
@@ -46,6 +48,7 @@ mutation createBook($title: String!, $published: Int!, $author: String!, $genres
             born
         }
         genres
+        id
     }
 }
 `
@@ -87,7 +90,12 @@ const App = () => {
     const books = useQuery(ALL_BOOKS)
     const [addBook] = useMutation(CREATE_BOOK, {
         onError: () => {},
-        refetchQueries: [{ query: ALL_BOOKS }]
+        refetchQueries: [{ query: ALL_AUTHORS }],
+        update: (store, response) => {
+            const dataInStore = store.readQuery({ query: ALL_BOOKS })
+            dataInStore.allBooks.push(response.data.addBook)
+            store.writeQuery({ query: ALL_BOOKS, data: dataInStore })
+        }
     })
 
     const [login] = useMutation(LOGIN, {
