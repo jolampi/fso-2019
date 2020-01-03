@@ -13,7 +13,7 @@ const EditAuthor = (props) => {
         await props.editAuthor({
             variables: { name: name.value, setBornTo: Number(born) }
         })
-        setName('')
+        setName({ value: '' })
         setBorn('')
     }
 
@@ -23,9 +23,9 @@ const EditAuthor = (props) => {
             <form onSubmit={submit}>
                 <div>
                     name
-                    <select value={name} onChange={({target}) => setName({value: target.value})}>
+                    <select value={name.value} onChange={({target}) => setName({value: target.value})}>
                         {props.result.data.allAuthors.map(author =>
-                            <option key={author.name} value={author.name}>{author.name}</option>
+                            <option key={author.id} value={author.name}>{author.name}</option>
                         )}
                     </select>
                 </div>
