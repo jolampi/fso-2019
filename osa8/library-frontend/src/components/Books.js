@@ -20,35 +20,61 @@ const Books = (props) => {
     const [filter, setFilter] = useState(null)
     const [genres, setGenres] = useState([])
     const [books, setBooks] = useState([])
+    const [forceUpdate, setForceUpdate] = useState(false)
     const client = useApolloClient()
 
     useEffect(() => {
         const queryBooks = async () => {
-            const { data } = await client.query({
-                query: FIND_BOOKS_BY_GENRE,
-                variables: (filter) ? { genre: filter } : {}
-            })
+            const queryObject = { query: FIND_BOOKS_BY_GENRE }
+            if (filter) { queryObject.variables = { genre: filter } }
+            const { data } = await client.query(queryObject)
             setBooks(data.allBooks)
-            let foundGenres = genres
-            data.allBooks.forEach(book => {
-                book.genres.forEach(g => {
-                    if (!foundGenres.includes(g)) { foundGenres = foundGenres.concat(g) }
+            setGenres(genres => {
+                let foundGenres = genres
+                data.allBooks.forEach(book => {
+                    book.genres.forEach(g => {
+                        if (!foundGenres.includes(g)) { foundGenres = foundGenres.concat(g) }
+                    })
                 })
-                setGenres(foundGenres.sort())
+                return foundGenres.sort()
             })
         }
+        console.log('spam')
         queryBooks()
-    // eslint-disable-next-line
-    }, [filter])
     
-    if (!props.show) {
-        return null
+    }, [client, filter, forceUpdate])
+    
+    if (!props.show) { return null }
+
+    if (props.recommend && props.recommend !== filter) {
+        setFilter(props.recommend)
+        console.log('hur dur', props.favourite)
+    }
+
+    const handleClick = (value) => {
+        if (filter === value) {
+            console.log('forced')
+            setForceUpdate(!forceUpdate)
+        } else {
+            console.log('normal')
+            setFilter(value)
+        }
+    }
+
+    const subHeader = () => {
+        if (!filter) { return null }
+        return (
+            <div>
+                {props.recommend ? <>books in your favourite genre</> : <>in genre</>}
+                <strong> {filter}</strong>
+            </div>
+        )
     }
 
     return (
         <div>
             <h2>books</h2>
-            {!filter ? null : <div>in genre <strong>{filter}</strong></div>}
+            {subHeader()}
             <table>
                 <tbody>
                     <tr>
@@ -69,15 +95,17 @@ const Books = (props) => {
                     )}
                 </tbody>
             </table>
-            <div>
-                {genres.map(genre =>
-                    <button
-                        key={genre}
-                        onClick={() => setFilter(genre)}
-                    >{genre}</button>
-                )}
-                <button onClick={() => setFilter(null)}>all genres</button>
-            </div>
+            {!props.recommend && (
+                <div>
+                    {genres.map(genre =>
+                        <button
+                            key={genre}
+                            onClick={() => handleClick(genre)}
+                        >{genre}</button>
+                    )}
+                    <button onClick={() => handleClick(null)}>all genres</button>
+                </div>
+            )}
         </div>
     )
 }

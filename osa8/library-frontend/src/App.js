@@ -9,75 +9,84 @@ import LoginForm from './components/LoginForm'
 import NewBook from './components/NewBook'
 
 const ALL_AUTHORS = gql`
-{
-    allAuthors {
-        name
-        born
-        bookCount
-        id
+    {
+        allAuthors {
+            name
+            born
+            bookCount
+            id
+        }
     }
-}
 `
 
 const ALL_BOOKS = gql`
-{
-    allBooks {
-        title
-        author {
-            name
+    {
+        allBooks {
+            title
+            author {
+                name
+            }
+            published
+            genres
+            id
         }
-        published
-        genres
-        id
     }
-}
 `
 
 const CREATE_BOOK = gql`
-mutation createBook($title: String!, $published: Int!, $author: String!, $genres: [String!]!) {
-    addBook(
-        title: $title,
-        published: $published,
-        author: $author,
-        genres: $genres
-    ) {
-        title
-        published
-        author {
-            name
-            born
+    mutation createBook($title: String!, $published: Int!, $author: String!, $genres: [String!]!) {
+        addBook(
+            title: $title,
+            published: $published,
+            author: $author,
+            genres: $genres
+        ) {
+            title
+            published
+            author {
+                name
+                born
+            }
+            genres
+            id
         }
-        genres
-        id
     }
-}
 `
 
 const EDIT_AUTHOR = gql`
-mutation editAuthor($name: String!, $setBornTo: Int!) {
-    editAuthor(
-        name: $name,
-        setBornTo: $setBornTo
-    ) {
-        name
-        born
-        id
+    mutation editAuthor($name: String!, $setBornTo: Int!) {
+        editAuthor(
+            name: $name,
+            setBornTo: $setBornTo
+        ) {
+            name
+            born
+            id
+        }
     }
-}
 `
 
 const LOGIN = gql`
-mutation login($username: String!, $password: String!) {
-    login(username: $username, password: $password) {
-        value
+    mutation login($username: String!, $password: String!) {
+        login(username: $username, password: $password) {
+            value
+        }
     }
-}
+`
+
+const ME = gql`
+    {
+        me {
+            favouriteGenre
+        }
+    }
 `
 
 
 const App = () => {
     const [page, setPage] = useState('authors')
     const [token, setToken] = useState(null)
+    const [user, setUser] = useState(null)
     
     const client = useApolloClient()
 
@@ -87,6 +96,7 @@ const App = () => {
         refetchQueries: [{ query: ALL_AUTHORS }]
     })
 
+    useQuery(ALL_BOOKS)
     const [addBook] = useMutation(CREATE_BOOK, {
         onError: () => {},
         refetchQueries: [{ query: ALL_AUTHORS }],
@@ -109,6 +119,11 @@ const App = () => {
             const token = result.data.login.value
             localStorage.setItem('LibraryAppUserToken', token)
             setToken(token)
+            
+            const { data } = await client.query({ query: ME })
+            console.log(data.me)
+            setUser(data.me)
+
             setPage('authors')
         } else { success = false }
 
@@ -130,6 +145,7 @@ const App = () => {
                         <button onClick={() => setPage('login')}>login</button>
                     ) : (
                         <div style={({ display: 'inline-block' })}>
+                            <button onClick={() => setPage('recommend')}>recommend</button>
                             <button onClick={() => setPage('add')}>add book</button>
                             <button onClick={handleLogout}>logout</button>
                         </div>
@@ -141,7 +157,10 @@ const App = () => {
                     show={token && page === 'authors'}
                     result={authors}
                     editAuthor={editAuthor} />
-                <Books show={page === 'books'} />
+                <Books
+                    show={page === 'books' || page === 'recommend'}
+                    recommend={(page === 'recommend') ? user.favouriteGenre : null}
+                />
                 <LoginForm
                     show={page === 'login'}
                     handleLogin={handleLogin}
