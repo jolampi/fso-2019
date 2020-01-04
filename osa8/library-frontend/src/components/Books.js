@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { gql } from 'apollo-boost'
 import { useApolloClient } from '@apollo/react-hooks'
 
@@ -8,6 +8,9 @@ export const FIND_BOOKS_BY_GENRE = gql`
             title
             author {
                 name
+                born
+                bookCount
+                id
             }
             published
             genres
@@ -16,7 +19,7 @@ export const FIND_BOOKS_BY_GENRE = gql`
     }
 `
 
-const Books = (props) => {
+const Books = (props, ref) => {
     const [filter, setFilter] = useState(null)
     const [genres, setGenres] = useState([])
     const [books, setBooks] = useState([])
@@ -41,7 +44,7 @@ const Books = (props) => {
         }
         queryBooks()
     }, [client, filter, forceUpdate])
-    
+
     if (!props.show) { return null }
 
     if (props.recommend && props.recommend !== filter) {

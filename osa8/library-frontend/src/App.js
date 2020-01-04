@@ -1,12 +1,27 @@
 import React, { useState } from 'react'
 import { gql } from 'apollo-boost'
-import { useApolloClient, useMutation, useQuery } from '@apollo/react-hooks'
+import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/react-hooks'
 
 import Authors from './components/Authors'
 import EditAuthor from './components/EditAuthor'
 import Books, { FIND_BOOKS_BY_GENRE } from './components/Books'
 import LoginForm from './components/LoginForm'
 import NewBook from './components/NewBook'
+
+const BOOK_DETAILS = gql`
+    fragment BookDetails on Book {
+        title
+        published
+        author {
+            name
+            born
+            bookCount
+            id
+        }
+        genres
+        id
+    }
+`
 
 const ALL_AUTHORS = gql`
     {
@@ -27,16 +42,10 @@ const CREATE_BOOK = gql`
             author: $author,
             genres: $genres
         ) {
-            title
-            published
-            author {
-                name
-                born
-            }
-            genres
-            id
+            ...BookDetails
         }
     }
+    ${BOOK_DETAILS}
 `
 
 const EDIT_AUTHOR = gql`
@@ -68,6 +77,15 @@ const ME = gql`
     }
 `
 
+const BOOK_ADDED = gql`
+    subscription {
+        bookAdded {
+            ...BookDetails
+        }
+    }
+    ${BOOK_DETAILS}
+`
+
 
 const App = () => {
     const [page, setPage] = useState('authors')
@@ -82,25 +100,49 @@ const App = () => {
         refetchQueries: [{ query: ALL_AUTHORS }]
     })
 
+    const updateCacheWith = (addedBook) => {
+        // Add author if new
+        const authorsInStore = client.readQuery({ query: ALL_AUTHORS })
+        if (!authorsInStore.allAuthors.map(a => a.id).includes(addedBook.author.id)) {
+            client.writeQuery({
+                query: ALL_AUTHORS,
+                data: { allAuthors: authorsInStore.allAuthors.concat(addedBook.author) }
+            })
+        }
+
+        // Update each existing cached result per genre
+        addedBook.genres.concat(null).forEach(genre => {
+            let queryObject = { query: FIND_BOOKS_BY_GENRE }
+            if (genre) { queryObject = { ...queryObject, variables: { genre } } }
+            try {
+                const booksInStore = client.readQuery(queryObject)
+                if (!booksInStore.allBooks.map(b => b.id).includes(addedBook.id)) {
+                    client.writeQuery({
+                        ...queryObject,
+                        data: { allBooks: booksInStore.allBooks.concat(addedBook) }
+                    })
+                }
+            } catch(error) { /* no cache data to update */ }
+        })
+    }
+
     const [addBook] = useMutation(CREATE_BOOK, {
         onError: () => {},
-        refetchQueries: [{ query: ALL_AUTHORS }],
         update: (store, response) => {
-            const array = response.data.addBook.genres.concat(null)
-            array.forEach(genre => {
-                let queryObject = { query: FIND_BOOKS_BY_GENRE }
-                if (genre) { queryObject = { ...queryObject, variables: { genre } } }
-                try {
-                    const dataInStore = store.readQuery(queryObject)
-                    dataInStore.allBooks.push(response.data.addBook)
-                    store.writeQuery({ ...queryObject, data: dataInStore })
-                } catch(error) { /* no cache data to update */ }
-            })
+            updateCacheWith(response.data.addBook)
         }
     })
 
     const [login] = useMutation(LOGIN, {
         onError: () => {}
+    })
+
+    useSubscription(BOOK_ADDED, {
+        onSubscriptionData: ({ subscriptionData }) => {
+            const bookAdded = subscriptionData.data.bookAdded
+            updateCacheWith(bookAdded)
+            window.alert(`${subscriptionData.data.bookAdded.title} added!!!`)
+        }
     })
 
     const handleLogin = async (username, password, callback) => {
