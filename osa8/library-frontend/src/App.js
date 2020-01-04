@@ -4,7 +4,7 @@ import { useApolloClient, useMutation, useQuery } from '@apollo/react-hooks'
 
 import Authors from './components/Authors'
 import EditAuthor from './components/EditAuthor'
-import Books from './components/Books'
+import Books, { FIND_BOOKS_BY_GENRE } from './components/Books'
 import LoginForm from './components/LoginForm'
 import NewBook from './components/NewBook'
 
@@ -14,20 +14,6 @@ const ALL_AUTHORS = gql`
             name
             born
             bookCount
-            id
-        }
-    }
-`
-
-const ALL_BOOKS = gql`
-    {
-        allBooks {
-            title
-            author {
-                name
-            }
-            published
-            genres
             id
         }
     }
@@ -96,14 +82,20 @@ const App = () => {
         refetchQueries: [{ query: ALL_AUTHORS }]
     })
 
-    useQuery(ALL_BOOKS)
     const [addBook] = useMutation(CREATE_BOOK, {
         onError: () => {},
         refetchQueries: [{ query: ALL_AUTHORS }],
         update: (store, response) => {
-            const dataInStore = store.readQuery({ query: ALL_BOOKS })
-            dataInStore.allBooks.push(response.data.addBook)
-            store.writeQuery({ query: ALL_BOOKS, data: dataInStore })
+            const array = response.data.addBook.genres.concat(null)
+            array.forEach(genre => {
+                let queryObject = { query: FIND_BOOKS_BY_GENRE }
+                if (genre) { queryObject = { ...queryObject, variables: { genre } } }
+                try {
+                    const dataInStore = store.readQuery(queryObject)
+                    dataInStore.allBooks.push(response.data.addBook)
+                    store.writeQuery({ ...queryObject, data: dataInStore })
+                } catch(error) { /* no cache data to update */ }
+            })
         }
     })
 
@@ -121,7 +113,6 @@ const App = () => {
             setToken(token)
             
             const { data } = await client.query({ query: ME })
-            console.log(data.me)
             setUser(data.me)
 
             setPage('authors')

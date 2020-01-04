@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { gql } from 'apollo-boost'
 import { useApolloClient } from '@apollo/react-hooks'
 
-const FIND_BOOKS_BY_GENRE = gql`
+export const FIND_BOOKS_BY_GENRE = gql`
     query findBooksByGenre($genre: String) {
         allBooks(genre: $genre) {
             title
@@ -39,24 +39,19 @@ const Books = (props) => {
                 return foundGenres.sort()
             })
         }
-        console.log('spam')
         queryBooks()
-    
     }, [client, filter, forceUpdate])
     
     if (!props.show) { return null }
 
     if (props.recommend && props.recommend !== filter) {
         setFilter(props.recommend)
-        console.log('hur dur', props.favourite)
     }
 
     const handleClick = (value) => {
         if (filter === value) {
-            console.log('forced')
             setForceUpdate(!forceUpdate)
         } else {
-            console.log('normal')
             setFilter(value)
         }
     }
