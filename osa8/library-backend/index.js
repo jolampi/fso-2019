@@ -94,7 +94,7 @@ const findAuthorByName = async (name) => {
 
 const resolvers = {
     Query: {
-        allAuthors: () => Author.find({}),
+        allAuthors: () => Author.find({}).populate('books'),
         allBooks: async (root, args) => {
             const matcher = {}
             let author
@@ -118,23 +118,20 @@ const resolvers = {
 
     },
     Author: {
-        bookCount: async (root) => {
-            const books = await Book.find({ author: root.id })
-            return books.length
-        }
+        bookCount: async (root) => root.books.length
     },
     Mutation: {
         addBook: async (root, args, context) => {
             if (!context.currentUser) { throw new AuthenticationError('not authenticated') }
 
             let authorId
-            const author = await findAuthorByName(args.author)
+            let author = await findAuthorByName(args.author)
             if (author) {
                 authorId = author._id
             } else {
                 try {
-                    const newAuthor = await new Author({ name: args.author }).save()
-                    authorId = newAuthor._id
+                    author = await new Author({ name: args.author }).save()
+                    authorId = author._id
                 } catch(error) {
                     throw new UserInputError(error.message, { invalidArgs: [ args.author ] })
                 }
@@ -142,8 +139,10 @@ const resolvers = {
 
             try {
                 const book = await new Book({ ...args, author: authorId }).save()
+                await Author.findByIdAndUpdate(authorId, { books: author.books.concat(book) })
                 const populatedBook = await book.populate('author').execPopulate()
-                
+
+
                 pubsub.publish('BOOK_ADDED', { bookAdded: populatedBook })
                 return populatedBook
             } catch(error) {
